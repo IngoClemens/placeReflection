@@ -1,0 +1,10 @@
+Changelog:
+
+1.1 - 2018-10-03
+    - Added a second speed mode which is accesible by pressing the control key (shift: slow, control: fast)
+    - Changed the optionVar names to reflect the new speed settings.
+    - The executing _place() method now directly receives the modifier key instead of just a boolean to turn move mode on or off.
+    - Fixed a stutter during the placing when the object to place moved under the cursor and gets picked as the object to drag on.
+
+1.0 - 2018-10-02
+    - Initial version.
