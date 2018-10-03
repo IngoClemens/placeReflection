@@ -33,17 +33,16 @@ placerContext.create()
 The tool has two preference settings:
 
 **invert:**
-
 True, if the z axis should point away from the reflection point. Default is True.
 
 
 **speed:**
-
 The increment size when moving the object towards/away from the reflection point in move mode.
 
 Defaults are:
 - 0: Slow: 0.001
 - 1: Fast: 0.01
+
 
 
 #### Setting preferences:
