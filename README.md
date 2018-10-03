@@ -46,19 +46,24 @@ Defaults are:
 - 1: Fast: 0.01
 
 
-When setting these values for the existing context they get stored with the Maya preferences:
+#### Setting preferences:
+When setting preference values for the existing context they get stored with the Maya preferences:
 
-Example:
+**Example:**
 
+```
 placerContext.setInvert(True)
-
 placerContext.setSpeed(0, 0.001) # slow: 0.001
+```
 
 
+#### Reading preferences:
 To read the current settings use:
 
+```
 placerContext.invert()
-
 placerContext.speed(0) # slow
+```
 
-## Latest version: 1.1 (2018-10-03)
+
+### Latest version: 1.1 (2018-10-03)
