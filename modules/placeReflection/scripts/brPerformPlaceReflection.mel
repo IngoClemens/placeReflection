@@ -1,0 +1,276 @@
+// ---------------------------------------------------------------------
+// brPerformPlaceReflection.mel
+//
+// Creates an option box for setting the preferences for the place
+// reflection tool.
+//
+// Copyright (c) 2018 Ingo Clemens, brave rabbit
+// www.braverabbit.com
+//
+// Version: 1.2 (2018-10-04)
+//
+// ---------------------------------------------------------------------
+
+proc setOptionVars( int $forceFactorySettings )
+{
+    string $cmd = "from placeReflection import placeReflectionTool; ";
+    $cmd += "placeReflectionTool._setOptionVars(" + $forceFactorySettings + ")";
+    python($cmd);
+}
+
+global proc brPlaceReflectionSetup( string $parent, int $forceFactorySettings )
+{
+    setOptionVars($forceFactorySettings);
+    setParent $parent;
+
+    radioButtonGrp -edit
+                   -select (`optionVar -query brPlaceReflectionAxis` + 1)
+                   placeReflectionAxis;
+    checkBoxGrp -edit
+                -value1 `optionVar -query brPlaceReflectionInvertAxis`
+                placeReflectionDirection;
+    checkBoxGrp -edit
+                -value1 `optionVar -query brPlaceReflectionAffectTranslation`
+                placeReflectionAffectTranslation;
+    checkBoxGrp -edit
+                -value1 `optionVar -query brPlaceReflectionAffectRotation`
+                placeReflectionAffectRotation;
+    floatSliderGrp -edit
+                   -value `optionVar -query brPlaceReflectionSpeedSlow`
+                   placeReflectionSpeedSlow;
+    floatSliderGrp -edit
+                   -value `optionVar -query brPlaceReflectionSpeedFast`
+                   placeReflectionSpeedFast;
+}
+
+global proc brPlaceReflectionCallback (string $parent, int $doIt)
+{
+    setParent $parent;
+
+    optionVar -intValue brPlaceReflectionAxis
+              (`radioButtonGrp -query -select placeReflectionAxis` - 1);
+    optionVar -intValue brPlaceReflectionInvertAxis
+              `checkBoxGrp -query -value1 placeReflectionDirection`;
+    optionVar -intValue brPlaceReflectionAffectTranslation
+              `checkBoxGrp -query -value1 placeReflectionAffectTranslation`;
+    optionVar -intValue brPlaceReflectionAffectRotation
+              `checkBoxGrp -query -value1 placeReflectionAffectRotation`;
+    optionVar -floatValue brPlaceReflectionSpeedSlow
+              `floatSliderGrp -query -value placeReflectionSpeedSlow`;
+    optionVar -floatValue brPlaceReflectionSpeedFast
+              `floatSliderGrp -query -value placeReflectionSpeedFast`;
+
+    if (`draggerContext -exists brPlaceReflectionContext`)
+    {
+        string $cmd = "from placeReflection import placeReflectionTool; ";
+        $cmd += "placeReflectionTool._getOptionVars()";
+        python($cmd);
+    }
+
+    if ($doIt)
+    {
+        brPerformPlaceReflection 0;
+        string $cmd = "brPerformPlaceReflection 0 ";
+        addToRecentCommandQueue $cmd "Place Reflection";
+    }
+}
+
+global proc brPlaceReflectionOptions()
+{
+    // global template variable for form spacing
+    global int $gOptionBoxTemplateFrameSpacing;
+
+    string $desc = "Usage:\n";
+    $desc += "Select any transform node to place and activate the tool.\n";
+    $desc += ("LMB drag over any mesh surface to place the selection at a reflected\n"+
+              "position across the surface.\n");
+    $desc += ("Press and hold the shift or ctrl key while dragging to move the object\n"+
+              "towards or away from the surface.\n");
+    $desc += "Click and dragging while holding shift or ctrl directly moves the object.\n";
+
+    string $commandName = "brPlaceReflection";
+    string $callback = $commandName + "Callback";
+    string $setup = $commandName + "Setup";
+
+    setOptionVars 0;
+
+    // get the option box
+    string $layout = getOptionBox();
+    setParent $layout;
+
+    // pass the command to the option box
+    setOptionBoxCommandName($commandName);
+
+    // activate the option box template
+    setUITemplate -pushTemplate OptionBoxTemplate;
+
+    // create the content
+    waitCursor -state 1;
+
+    // form layout
+    string $parent = `formLayout placeReflectionOptions`;
+
+        // settings frame
+        string $settingsFrame = `frameLayout -label "Settings"`;
+
+            columnLayout;
+
+                text -label $desc -align "left";
+
+                separator -style "in";
+
+                radioButtonGrp
+                    -numberOfRadioButtons 3
+                    -label "Axis"
+                    -labelArray3 "X" "Y" "Z"
+                    -select 3
+                    -vertical
+                    placeReflectionAxis;
+
+                checkBoxGrp
+                    -label1 "Invert Axis"
+                    -value1 `optionVar -query brPlaceReflectionInvertAxis`
+                    placeReflectionDirection;
+
+                separator -style "in";
+
+                checkBoxGrp
+                    -label1 "Translation"
+                    -value1 `optionVar -query brPlaceReflectionAffectTranslation`
+                    placeReflectionAffectTranslation;
+
+                checkBoxGrp
+                    -label1 "Rotation"
+                    -value1 `optionVar -query brPlaceReflectionAffectRotation`
+                    placeReflectionAffectRotation;
+
+                separator -style "in";
+
+                floatSliderGrp
+                    -field true
+                    -minValue 0.0001
+                    -maxValue 1.0
+                    -value `optionVar -query brPlaceReflectionSpeedSlow`
+                    -fieldMinValue 0.00001
+                    -fieldMaxValue 10.0
+                    -label "Speed Min"
+                    placeReflectionSpeedSlow;
+
+                floatSliderGrp
+                    -field true
+                    -minValue 0.0001
+                    -maxValue 1.0
+                    -value `optionVar -query brPlaceReflectionSpeedFast`
+                    -fieldMinValue 0.00001
+                    -fieldMaxValue 10.0
+                    -label "Speed Max"
+                    placeReflectionSpeedFast;
+
+            setParent ..;
+
+        setParent $parent;
+
+    setParent ..;
+
+    // attach description/settings frames to form layout
+    formLayout -edit
+               -attachForm $settingsFrame "top" $gOptionBoxTemplateFrameSpacing
+               -attachForm $settingsFrame "left" $gOptionBoxTemplateFrameSpacing
+               -attachForm $settingsFrame "right" $gOptionBoxTemplateFrameSpacing
+               -attachNone $settingsFrame "bottom"
+    $parent;
+
+    waitCursor -state 0;
+
+    // deactivate the template
+    setUITemplate -popTemplate;
+
+    // customize the buttons
+    string $applyBtn = getOptionBoxApplyBtn();
+    button -edit
+           -label "Apply"
+           -command ($callback + " " + $parent + " " + 1)
+           $applyBtn;
+
+    string $applyAndCloseBtn = getOptionBoxApplyAndCloseBtn();
+    button -edit
+           -label "Apply And Close"
+           $applyAndCloseBtn;
+
+    string $saveBtn = getOptionBoxSaveBtn();
+    button -edit
+           -command ($callback + " " + $parent + " " + 0 + " " + "; hideOptionBox")
+           $saveBtn;
+
+    string $resetBtn = getOptionBoxResetBtn();
+    button -edit
+           -command ($setup + " " + $parent + " " + 1)
+           $resetBtn;
+
+    // set the window title
+    setOptionBoxTitle("Place Reflection Options");
+
+    // edit the help text
+    setOptionBoxHelpTag("PlaceReflection");
+
+    // set the current values
+    eval ($setup + " " + $parent + " " + 0);
+
+    // show the option box
+    showOptionBox();
+}
+
+proc string assembleCmd()
+{
+    setOptionVars 0;
+    string $cmd = "from placeReflection import placeReflectionTool; ";
+    $cmd += "placeReflectionTool.create()";
+    return $cmd;
+}
+
+global proc string brPerformPlaceReflection( int $option )
+{
+    string $cmd = "";
+    switch ($option)
+    {
+        case 0:
+            $cmd = `assembleCmd`;
+            python($cmd);
+            break;
+        case 1:
+            brPlaceReflectionOptions;
+            break;
+        case 2:
+            $cmd = `assembleCmd`;
+            break;
+    }
+    return $cmd;
+}
+
+// ---------------------------------------------------------------------
+// MIT License
+//
+// Copyright (c) 2018 Ingo Clemens, brave rabbit
+// placer is under the terms of the MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Author: Ingo Clemens    www.braverabbit.com
+// ---------------------------------------------------------------------

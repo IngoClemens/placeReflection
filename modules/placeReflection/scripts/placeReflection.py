@@ -1,10 +1,10 @@
 # ----------------------------------------------------------------------
-# placer.py
+# placeReflection.py
 #
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
 # www.braverabbit.com
 #
-# Version: 1.1 (2018-10-03)
+# Version: 1.2 (2018-10-04)
 #
 # ----------------------------------------------------------------------
 # Description:
@@ -20,43 +20,67 @@
 # Place Mode: The default dragger context mode. LMB click and drag to
 #             place the selected object based on the surface the cursor
 #             is dragged over.
-# Move Mode: Press and hold Shift or Control while dragging. This moves
+# Move Mode: Press and hold Shift or Ctrl while dragging. This moves
 #            the object towards/away from the reflection point. Shift
-#            gives a finer control whereas control performs the moving
+#            gives a finer control whereas Ctrl performs the moving
 #            in a faster fashion.
 #
 # ----------------------------------------------------------------------
 # Usage:
 #
-# Select the object which should be placed and run the commands.
+# When properly installed the Maya Modify menu has a new menu item named
+# Place Reflection. It also allows to open a standard option box to set
+# the preferences for the tool.
+#
+# Standalone Usage:
+# When using the script without the supplementary scripts the tool can
+# be activated using the following commands with the current selection:
 #
 # # import the module and create the context
-# from placer import placerContext
-# placerContext.create()
+# from placeReflection import placeReflectionTool
+# placeReflectionTool.create()
 #
 # ----------------------------------------------------------------------
 # Preferences:
 #
-# The tool has two preference settings:
-#   invert: True, if the z axis should point away from the reflection
+# The tool has the following preference settings:
+#   axis: Defines the axis which is aimed at the point of reflection.
+#           Values:
+#               0: x axis
+#               1: y axis
+#               2: z axis (default)
+#   invert: True, if the axis should point away from the reflection
 #           point. Default is True.
-#   speed: The increment size when moving the object towards/away
-#          from the reflection point in move mode.
+#   rotate: True, if the rotation of the placing obeject should be
+#           affected. Default is True.
+#   speed: The speed when moving the object towards/away from the
+#          reflection point in move mode.
 #          Defaults are:
 #               0: Slow: 0.001
 #               1: Fast: 0.01
+#   translate: True, if the translation of the placing object should be
+#              affected. Default is True.
 #
 # When setting these values for the existing context they get stored
 # with the Maya preferences:
-# placerContext.setInvert(True)
-# placerContext.setSpeed(0, 0.001) # slow: 0.001
+# placeReflectionTool.setInvert(True)
+# placeReflectionTool.setSpeed(0, 0.001) # slow: 0.001
 #
 # To read the current settings use:
-# placerContext.invert()
-# placerContext.speed(0) # slow
+# placeReflectionTool.invert()
+# placeReflectionTool.speed(0) # slow
 #
 # ----------------------------------------------------------------------
 # Changelog:
+#
+#   1.2 - 2018-10-04
+#       - Added the option to define the axis which should aim towards
+#         the point of reflection.
+#       - Added the options to either affect just the translation or the
+#         rotation of the placing object.
+#       - Added a standard Maya option dialog for setting tool
+#         preferences.
+#       - Added a menu item in the default Maya modify menu.
 #
 #   1.1 - 2018-10-03
 #       - Added a second speed mode which is accesible by pressing the
@@ -85,16 +109,20 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-PLACER_CONTEXT_NAME = "brPlacerContext"
-INVERT_AXIS = "brPlacerContextInvertAxis"
-SPEED_SLOW = "brPlacerContextSpeedSlow"
-SPEED_FAST = "brPlacerContextSpeedFast"
+CONTEXT_NAME = "brPlaceReflectionContext"
+
+AFFECT_TRANSLATION = "brPlaceReflectionAffectTranslation"
+AFFECT_ROTATION = "brPlaceReflectionAffectRotation"
+INVERT_AXIS = "brPlaceReflectionInvertAxis"
+ORIENT_AXIS = "brPlaceReflectionAxis"
+SPEED_SLOW = "brPlaceReflectionSpeedSlow"
+SPEED_FAST = "brPlaceReflectionSpeedFast"
 
 SPEED_SLOW_VALUE = 0.001
 SPEED_FAST_VALUE = 0.01
 
 
-class Placer():
+class PlaceReflection():
 
     def __init__(self):
         self._view = om2UI.M3dView()
@@ -122,11 +150,15 @@ class Placer():
         # the reflection vector
         self._reflVector = None
 
-        # preference settings
+        # create the preference settings if they don't exist
         self._setOptionVars()
-        self._invert = cmds.optionVar(query=INVERT_AXIS)
-        self._speedSlow = cmds.optionVar(query=SPEED_SLOW)
-        self._speedFast = cmds.optionVar(query=SPEED_FAST)
+
+        self._axis = 2
+        self._invert = True
+        self._translate = True
+        self._rotate = True
+        self._speedSlow = 0.001
+        self._speedFast = 0.01
 
 
     # ------------------------------------------------------------------
@@ -136,32 +168,107 @@ class Placer():
     def create(self):
         """Create the dragger context and set it to be the active tool.
         """
-        if not cmds.draggerContext(PLACER_CONTEXT_NAME, exists=True):
-            cmds.draggerContext(PLACER_CONTEXT_NAME,
-                                pressCommand="placerContext._press()",
-                                dragCommand="placerContext._drag()",
-                                releaseCommand="placerContext._release()",
-                                finalize="placerContext._finalize()",
+        helpString = ("Press and drag over surface to place the selection. "
+                      "Hold shift (slow) or control (fast) to move.")
+        if not cmds.draggerContext(CONTEXT_NAME, exists=True):
+            cmds.draggerContext(CONTEXT_NAME,
+                                pressCommand="placeReflectionTool._press()",
+                                dragCommand="placeReflectionTool._drag()",
+                                releaseCommand="placeReflectionTool._release()",
+                                finalize="placeReflectionTool._finalize()",
                                 space="screen",
                                 stepsCount=1,
                                 undoMode="step",
                                 cursor="crossHair",
-                                helpString="Press and drag over surface to place the selection.")
-            logger.info("Created {}".format(PLACER_CONTEXT_NAME))
-        cmds.setToolTo(PLACER_CONTEXT_NAME)
+                                helpString=helpString,
+                                image1="placeReflection.png")
+            logger.info("Created {}".format(CONTEXT_NAME))
+        cmds.setToolTo(CONTEXT_NAME)
+
+        # get the preference settings
+        self._getOptionVars()
 
 
     def delete(self):
         """Delete the dragger context.
         """
         tool = mel.eval("global string $gSelect; setToolTo $gSelect;")
-        cmds.deleteUI(PLACER_CONTEXT_NAME)
-        logger.info("Deleted {}".format(PLACER_CONTEXT_NAME))
+        cmds.deleteUI(CONTEXT_NAME)
+        logger.info("Deleted {}".format(CONTEXT_NAME))
 
 
     # ------------------------------------------------------------------
     # preferences
     # ------------------------------------------------------------------
+
+    def translate(self):
+        """Return if the object's translation is affected.
+
+        :return: The translation state.
+        :rtype: bool
+        """
+        return self._translate
+
+
+    def setTranslate(self, value):
+        """Set if the object's translation is affected.
+
+        :param value: The translation state.
+        :type value: bool
+        """
+        self._translate = value
+        cmds.optionVar(intValue=(AFFECT_TRANSLATION, value))
+
+
+    def rotate(self):
+        """Return if the object's rotation is affected.
+
+        :return: The rotation state.
+        :rtype: bool
+        """
+        return self._rotate
+
+
+    def setRotate(self, value):
+        """Set if the object's rotation is affected.
+
+        :param value: The rotate state.
+        :type value: bool
+        """
+        self._rotate = value
+        cmds.optionVar(intValue=(AFFECT_ROTATION, value))
+
+
+    def axis(self):
+        """Return the index of the axis which should aim towards the
+        point of reflection.
+
+        Values:
+            0: X axis
+            1: Y axis
+            2: Z axis
+
+        :return: The index of the axis.
+        :rtype: int
+        """
+        return self._axis
+
+
+    def setAxis(self, value):
+        """Set the index of the axis which should aim towards the
+        point of reflection.
+
+        Values:
+            0: X axis
+            1: Y axis
+            2: Z axis
+
+        :param value: The index of the axis.
+        :type value: int
+        """
+        self._axis = value
+        cmds.optionVar(intValue=(ORIENT_AXIS, value))
+
 
     def invert(self):
         """Return if the object's aim axis is inverted.
@@ -227,14 +334,34 @@ class Placer():
         :param reset: True, to reset to the default values.
         :type reset: bool
         """
+        if reset or not cmds.optionVar(exists=AFFECT_TRANSLATION):
+            cmds.optionVar(intValue=(AFFECT_TRANSLATION, 1))
+
+        if reset or not cmds.optionVar(exists=AFFECT_ROTATION):
+            cmds.optionVar(intValue=(AFFECT_ROTATION, 1))
+
         if reset or not cmds.optionVar(exists=INVERT_AXIS):
             cmds.optionVar(intValue=(INVERT_AXIS, 1))
+
+        if reset or not cmds.optionVar(exists=ORIENT_AXIS):
+            cmds.optionVar(intValue=(ORIENT_AXIS, 2))
 
         if reset or not cmds.optionVar(exists=SPEED_SLOW):
             cmds.optionVar(floatValue=(SPEED_SLOW, SPEED_SLOW_VALUE))
 
         if reset or not cmds.optionVar(exists=SPEED_FAST):
             cmds.optionVar(floatValue=(SPEED_FAST, SPEED_FAST_VALUE))
+
+
+    def _getOptionVars(self):
+        """Get the preference values.
+        """
+        self._axis = cmds.optionVar(query=ORIENT_AXIS)
+        self._invert = cmds.optionVar(query=INVERT_AXIS)
+        self._translate = cmds.optionVar(query=AFFECT_TRANSLATION)
+        self._rotate = cmds.optionVar(query=AFFECT_ROTATION)
+        self._speedSlow = cmds.optionVar(query=SPEED_SLOW)
+        self._speedFast = cmds.optionVar(query=SPEED_FAST)
 
 
     # ------------------------------------------------------------------
@@ -265,9 +392,9 @@ class Placer():
             return
 
         # get the drag point from the context and perform the placing
-        anchorPoint = cmds.draggerContext(PLACER_CONTEXT_NAME, query=True, anchorPoint=True)
-        dragPoint = cmds.draggerContext(PLACER_CONTEXT_NAME, query=True, dragPoint=True)
-        modifier = cmds.draggerContext(PLACER_CONTEXT_NAME, query=True, modifier=True)
+        anchorPoint = cmds.draggerContext(CONTEXT_NAME, query=True, anchorPoint=True)
+        dragPoint = cmds.draggerContext(CONTEXT_NAME, query=True, dragPoint=True)
+        modifier = cmds.draggerContext(CONTEXT_NAME, query=True, modifier=True)
         self._place(anchorPoint, dragPoint, modifier)
 
 
@@ -288,7 +415,7 @@ class Placer():
         """
         self._moveDist = 0.0
         self._isSet = False
-        logger.info("Reset {}".format(PLACER_CONTEXT_NAME))
+        logger.info("Reset {}".format(CONTEXT_NAME))
 
 
     # ------------------------------------------------------------------
@@ -375,13 +502,17 @@ class Placer():
         # rotation.
         mat = self._worldMatrix(self._dag.node())
         transMat = om2.MTransformationMatrix(mat)
-        # Calculate the reflected vector in world space and scale it
-        # by the current distance to the surface.
-        placeVector = self._reflVector * self._moveDist + om2.MVector(self._reflPoint)
-        transMat.setTranslation(placeVector, om2.MSpace.kWorld)
-        # Build the rotation quaternion from the reflection vector.
-        quat = self._quatFromVector(self._reflVector)
-        transMat.setRotation(quat)
+
+        if self._translate:
+            # Calculate the reflected vector in world space and scale it
+            # by the current distance to the surface.
+            placeVector = self._reflVector * self._moveDist + om2.MVector(self._reflPoint)
+            transMat.setTranslation(placeVector, om2.MSpace.kWorld)
+
+        if self._rotate:
+            # Build the rotation quaternion from the reflection vector.
+            quat = self._quatFromVector(self._reflVector)
+            transMat.setRotation(quat)
 
         # Finally, place the object at the reflected position.
         cmds.xform(self._dag.fullPathName(),
@@ -586,13 +717,34 @@ class Placer():
         cross1 = (vector^om2.MVector(0, 1, 0)).normalize()
         cross2 = (vector^cross1).normalize()
 
-        if not self._invert:
-            cross2 = om2.MVector(-cross2.x, -cross2.y, -cross2.z)
+        # x axis
+        if self._axis == 0:
+            xRot = om2.MVector(-vector.x, -vector.y, -vector.z)
+            yRot = om2.MVector(-cross2.x, -cross2.y, -cross2.z)
+            zRot = cross1
+            if self._invert:
+                xRot = om2.MVector(-xRot.x, -xRot.y, -xRot.z)
+        # y axis
+        elif self._axis == 1:
+            xRot = om2.MVector(-cross2.x, -cross2.y, -cross2.z)
+            yRot = om2.MVector(-vector.x, -vector.y, -vector.z)
+            zRot = cross1
+            if self._invert:
+                yRot = om2.MVector(-yRot.x, -yRot.y, -yRot.z)
+        # z axis
+        else:
+            xRot = cross1
+            yRot = om2.MVector(-cross2.x, -cross2.y, -cross2.z)
+            zRot = vector
+            if self._invert:
+                xRot = om2.MVector(-xRot.x, -xRot.y, -xRot.z)
+                zRot = om2.MVector(-zRot.x, -zRot.y, -zRot.z)
 
-        mat = om2.MMatrix([cross1.x, cross1.y, cross1.z, 0,
-                           cross2.x, cross2.y, cross2.z, 0,
-                           vector.x, vector.y, vector.z,
+        mat = om2.MMatrix([xRot.x, xRot.y, xRot.z, 0,
+                           yRot.x, yRot.y, yRot.z, 0,
+                           zRot.x, zRot.y, zRot.z,
                            0, 0, 0, 0, 1])
+
         # return the rotation as quaternion
         transMat = om2.MTransformationMatrix(mat)
         return transMat.rotation(True)
@@ -614,7 +766,7 @@ class Placer():
         return values
 
 
-placerContext = Placer()
+placeReflectionTool = PlaceReflection()
 
 # ----------------------------------------------------------------------
 # MIT License

@@ -1,0 +1,103 @@
+// ---------------------------------------------------------------------
+// brPlaceReflectionAddMenuItem.mel
+//
+// Creates a menu item for the place reflection tool in the default Maya
+// modify menu.
+//
+// Copyright (c) 2018 Ingo Clemens, brave rabbit
+// www.braverabbit.com
+//
+// Version: 1.2 (2018-10-04)
+//
+// ---------------------------------------------------------------------
+
+global proc brPlaceReflectionDeleteMenuItem()
+{
+    deleteUI brPlaceReflectionMenuDivider;
+    deleteUI brPlaceReflectionMenuItem;
+    deleteUI brPlaceReflectionMenuOptionItem;
+}
+
+proc int mayaVersion()
+{
+    int $version = `about -apiVersion` / 100.0;
+    if ($version > 10000)
+        $version = $version / 100;
+    return $version;
+}
+
+global proc brPlaceReflectionAddMenuCommand()
+{
+    global string $gMainModifyMenu;
+
+    if (`menu -ex $gMainModifyMenu`)
+        menu -edit
+             -postMenuCommand "brPlaceReflectionAddMenuItem"
+             -postMenuCommandOnce 1
+             $gMainModifyMenu;
+}
+
+global proc brPlaceReflectionAddMenuItem()
+{
+    global string $gMainModifyMenu;
+
+    int $version = `mayaVersion`;
+    string $menu = $gMainModifyMenu;
+
+    if (!`menu -query -numberOfItems $menu` || `menu -query -label $menu` != "Modify")
+        error "Error creating place reflection menu item.";
+    else
+    {
+        setParent -m $menu;
+        if ($version >= 2015)
+        {
+            menuItem -divider 1
+                     -dividerLabel "Place Reflection"
+                     brPlaceReflectionMenuDivider;
+        }
+        else
+            menuItem -divider 1 brPlaceReflectionMenuDivider;
+
+        string $ann = "Place an object by dragging over it's reflection point on a mesh surface";
+        string $cmd = "python(\"from placeReflection import placeReflectionTool; placeReflectionTool.create()\")";
+
+        menuItem -label "Place Reflection"
+                 -annotation $ann
+                 -command $cmd
+                 -image "placeReflection.png"
+                 brPlaceReflectionMenuItem;
+        menuItem -optionBox 1
+                 -annotation $ann
+                 -command "brPerformPlaceReflection 1"
+                 -image "placeReflection.png"
+                 brPlaceReflectionMenuOptionItem;
+    }
+}
+
+// ---------------------------------------------------------------------
+// MIT License
+//
+// Copyright (c) 2018 Ingo Clemens, brave rabbit
+// placer is under the terms of the MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Author: Ingo Clemens    www.braverabbit.com
+// ---------------------------------------------------------------------
