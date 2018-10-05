@@ -16,7 +16,7 @@ The default dragger context mode. LMB click and drag to place the selected objec
 
 **Move Mode:**
 
-Press and hold Shift or Ctrl while dragging. This moves the object towards/away from the reflection point. Shift gives a finer control whereas Ctrl performs the moving in a faster fashion.
+Press and hold Ctrl or Shift while dragging. This moves the object towards/away from the reflection point. Ctrl gives a finer control whereas Shift performs the moving in a faster fashion.
 
 ## Installation
 
@@ -101,25 +101,31 @@ placeReflectionTool.speed(0) # slow
 ```
 
 
-### Latest version: 1.1 (2018-10-03)
+### Latest version: 1.2.1 (2018-10-05)
 
 
 ## Changelog:
 
-**1.2 (2018-10-04)**
+**1.2.1 (2018-10-05)**
+
+    - Reversed the speed modifiers shift and ctrl to be more inline with the default Maya navigation (channel box).
+    - Having no placing object selected is now only a warning.
+    - Added a method to read the version.
+
+**1.2.0 (2018-10-04)**
 
     - Added the option to define the axis which should aim towards the point of reflection.
     - Added the options to either affect just the translation or the rotation of the placing object.
     - Added a standard Maya option dialog for setting tool preferences.
     - Added a menu item in the default Maya modify menu.
 
-**1.1 (2018-10-03)**
-    
+**1.1.0 (2018-10-03)**
+
     - Added a second speed mode which is accesible by pressing the control key (shift: slow, control: fast)
     - Changed the optionVar names to reflect the new speed settings.
     - The executing _place() method now directly receives the modifier key instead of just a boolean to turn move mode on or off.
     - Fixed a stutter during the placing when the object to place moved under the cursor and gets picked as the object to drag on.
 
-**1.0 (2018-10-02)**
-    
+**1.0.0 (2018-10-02)**
+
     - Initial version.

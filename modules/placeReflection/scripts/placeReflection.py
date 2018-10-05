@@ -3,9 +3,10 @@
 #
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
 # www.braverabbit.com
-#
-# Version: 1.2 (2018-10-04)
-#
+# ----------------------------------------------------------------------
+
+VERSION = {"version": [1, 2, 1], "date": "2018-10-05"}
+
 # ----------------------------------------------------------------------
 # Description:
 #
@@ -21,8 +22,8 @@
 #             place the selected object based on the surface the cursor
 #             is dragged over.
 # Move Mode: Press and hold Shift or Ctrl while dragging. This moves
-#            the object towards/away from the reflection point. Shift
-#            gives a finer control whereas Ctrl performs the moving
+#            the object towards/away from the reflection point. Ctrl
+#            gives a finer control whereas Shift performs the moving
 #            in a faster fashion.
 #
 # ----------------------------------------------------------------------
@@ -73,28 +74,34 @@
 # ----------------------------------------------------------------------
 # Changelog:
 #
-#   1.2 - 2018-10-04
-#       - Added the option to define the axis which should aim towards
-#         the point of reflection.
-#       - Added the options to either affect just the translation or the
-#         rotation of the placing object.
-#       - Added a standard Maya option dialog for setting tool
-#         preferences.
-#       - Added a menu item in the default Maya modify menu.
+#   1.2.1 - 2018-10-05
+#         - Reversed the speed modifiers shift and ctrl to be more
+#           inline with the default Maya navigation (channel box).
+#         - Having no placing object selected is now only a warning.
+#         - Added a method to read the version.
 #
-#   1.1 - 2018-10-03
-#       - Added a second speed mode which is accesible by pressing the
-#         control key (shift: slow, control: fast)
-#       - Changed the optionVar names to reflect the new speed settings.
-#       - The executing _place() method now directly receives the
-#         modifier key instead of just a boolean to turn move mode on or
-#         off.
-#       - Fixed a stutter during the placing when the object to place
-#         moved under the cursor and gets picked as the object to drag
-#         on.
+#   1.2.0 - 2018-10-04
+#         - Added the option to define the axis which should aim towards
+#           the point of reflection.
+#         - Added the options to either affect just the translation or the
+#           rotation of the placing object.
+#         - Added a standard Maya option dialog for setting tool
+#           preferences.
+#         - Added a menu item in the default Maya modify menu.
 #
-#   1.0 - 2018-10-02
-#       Initial version.
+#   1.1.0 - 2018-10-03
+#         - Added a second speed mode which is accesible by pressing the
+#           control key (shift: slow, ctrl: fast)
+#         - Changed the optionVar names to reflect the new speed settings.
+#         - The executing _place() method now directly receives the
+#           modifier key instead of just a boolean to turn move mode on or
+#           off.
+#         - Fixed a stutter during the placing when the placing object
+#           moved under the cursor and gets picked as the object to drag
+#           on.
+#
+#   1.0.0 - 2018-10-02
+#         Initial version.
 #
 # ----------------------------------------------------------------------
 
@@ -169,7 +176,7 @@ class PlaceReflection():
         """Create the dragger context and set it to be the active tool.
         """
         helpString = ("Press and drag over surface to place the selection. "
-                      "Hold shift (slow) or control (fast) to move.")
+                      "Hold ctrl (slow) or shift (fast) to move.")
         if not cmds.draggerContext(CONTEXT_NAME, exists=True):
             cmds.draggerContext(CONTEXT_NAME,
                                 pressCommand="placeReflectionTool._press()",
@@ -195,6 +202,23 @@ class PlaceReflection():
         tool = mel.eval("global string $gSelect; setToolTo $gSelect;")
         cmds.deleteUI(CONTEXT_NAME)
         logger.info("Deleted {}".format(CONTEXT_NAME))
+
+
+    def _version(self, long=True):
+        """Return the tool version.
+
+        :param long: True, if the version number and date should get
+                     returned.
+        :type long: bool
+
+        :return: The version string.
+        :rtype: str
+        """
+        version = ".".join([str(i) for i in VERSION["version"]])
+        if not long:
+            return version
+        version = "{} {}".format(version, VERSION["date"])
+        return version
 
 
     # ------------------------------------------------------------------
@@ -376,6 +400,8 @@ class PlaceReflection():
         self._view = om2UI.M3dView().active3dView()
         # get the MDagPath of the object to place
         self._dag = self._asDagPath()
+        if self._dag is None:
+            return
         # Set the distance to the last move distance so that the move
         # doesn't start from the original distance but the last modified
         # position.
@@ -447,22 +473,28 @@ class PlaceReflection():
                 return
             self._meshDag = dagPath
 
-            # Convert the screen position of the cursor to a world position.
+            # Convert the screen position of the cursor to a world
+            # position.
             worldPt = om2.MPoint()
             worldVector = om2.MVector()
             self._view.viewToWorld(xPos, yPos, worldPt, worldVector)
             # normalize the view vector, just in case
             viewVector = worldVector.normalize()
 
-            # Get the point of the closest intersection between the view ray
-            # and the mesh. Returns the tuple:
-            # (hitPoint, hitRayParam, hitFace, hitTriangle, hitBary1, hitBary2)
+            # Get the point of the closest intersection between the view
+            # ray and the mesh. Returns the tuple:
+            # (hitPoint, hitRayParam, hitFace, hitTriangle, hitBary1,
+            # hitBary2)
             intersection = self._closestIntersection(dagPath, worldPt, worldVector)
             if not len(intersection[0]):
                 return
+            # Store the hit point as the point of reflection.
+            # This is of type MFloatPoint() (just a reminder because it
+            # needs to get converted for other functions).
             self._reflPoint = intersection[0] # MFloatPoint()
 
-            # Get the closest normal of the mesh at the intersection point.
+            # Get the closest normal of the mesh at the intersection
+            # point.
             meshFn = om2.MFnMesh(dagPath)
             result = meshFn.getClosestNormal(om2.MPoint(self._reflPoint), om2.MSpace.kWorld)
             faceNormal = result[0]
@@ -470,9 +502,9 @@ class PlaceReflection():
             # Calculate the reflection vector.
             self._reflVector = self._reflectionVector(viewVector, faceNormal)
 
-            # Get the current distance of the object intersection point. The
-            # reflected position should have the same distance to the
-            # surface than before.
+            # Get the current distance of the object intersection point.
+            # The reflected position should have the same distance to
+            # the surface than before.
             pos = self._translation(self._dag.node())
             self._dist = self._distance(om2.MPoint(self._reflPoint), om2.MPoint(pos))
             self._moveDist = self._dist
@@ -485,14 +517,14 @@ class PlaceReflection():
         # --------------------------------------------------------------
         elif self._isSet:
             speedVal = self._speedSlow
-            if modifier == "ctrl":
+            if modifier == "shift":
                 speedVal = self._speedFast
             xPosStart = int(startPoint[0])
             dragDist = (xPos-xPosStart)*speedVal
             self._moveDist = self._dist*(1+dragDist)
 
         # --------------------------------------------------------------
-        # Simply return in case shift is pressed during the initial
+        # Simply return in case ctrl/shift is pressed during the initial
         # drag. Since no placing has been performed there are no values.
         # --------------------------------------------------------------
         else:
@@ -643,7 +675,7 @@ class PlaceReflection():
         :type name: str or None
 
         :return: The dagPath of the node.
-        :rtype: om2.MDagPath
+        :rtype: om2.MDagPath or None
         """
         sel = om2.MSelectionList()
         if name is None:
@@ -657,7 +689,7 @@ class PlaceReflection():
         if sel.length():
             return sel.getDagPath(0)
         else:
-            raise RuntimeError("No object selected to place.")
+            logger.warning("No object selected to place.")
 
 
     def _worldMatrix(self, obj):
@@ -707,6 +739,8 @@ class PlaceReflection():
 
     def _quatFromVector(self, vector):
         """Return a quaternion rotation from the given vector.
+
+        The y axis is used as the up vector.
 
         :param vector: The vector to build the quaternion from.
         :type vector: om2.MVector
@@ -772,7 +806,7 @@ placeReflectionTool = PlaceReflection()
 # MIT License
 #
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
-# placer is under the terms of the MIT License
+# placeReflection is under the terms of the MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the

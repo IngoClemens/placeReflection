@@ -7,7 +7,7 @@
 // Copyright (c) 2018 Ingo Clemens, brave rabbit
 // www.braverabbit.com
 //
-// Version: 1.2 (2018-10-04)
+// Version: 1.2.1 (2018-10-05)
 //
 // ---------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ global proc brPlaceReflectionAddMenuItem()
 // MIT License
 //
 // Copyright (c) 2018 Ingo Clemens, brave rabbit
-// placer is under the terms of the MIT License
+// placeReflection is under the terms of the MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
