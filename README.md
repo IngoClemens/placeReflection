@@ -26,7 +26,7 @@ For ease of use the script and related files are combined as a module. This allo
 
 **_Important:_**
 
-**_If after the installation the menu items don't show up it's possible that the downloaded files from github have faulty user permissions. In this case try to create the modules folder manually and check the permissions or download the file from [braverabbit](http://www.braverabbit.com/placereflection/)_**
+**_If after the installation the menu items don't show up it's possible that the downloaded files from github have faulty user permissions. In this case try to create the modules folder manually and check the permissions or download the file from [braverabbit](http://www.braverabbit.com/placereflection/)._**
 
 Copy the module folder from the repository to your Maya preferences. The tool is version independent which means it can be installed in the preferences root folder.
 
