@@ -7,7 +7,7 @@
 // Copyright (c) 2018 Ingo Clemens, brave rabbit
 // www.braverabbit.com
 //
-// Version: 1.2.1 (2018-10-05)
+// Version: 1.2.2 (2018-10-07)
 //
 // ---------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ global proc brPlaceReflectionDeleteMenuItem()
     deleteUI brPlaceReflectionMenuDivider;
     deleteUI brPlaceReflectionMenuItem;
     deleteUI brPlaceReflectionMenuOptionItem;
+    deleteUI brQuickZoomMenuItem;
 }
 
 proc int mayaVersion()
@@ -37,6 +38,32 @@ global proc brPlaceReflectionAddMenuCommand()
              $gMainModifyMenu;
 }
 
+proc addMenuItem()
+{
+    string $ann = "Place an object by dragging over it's reflection point on a mesh surface";
+    string $cmd = "python(\"from placeReflection import placeReflectionTool; placeReflectionTool.create()\")";
+
+    menuItem -label "Place Reflection Tool"
+             -annotation $ann
+             -command $cmd
+             -image "placeReflection.png"
+             brPlaceReflectionMenuItem;
+    menuItem -optionBox 1
+             -annotation $ann
+             -command "brPerformPlaceReflection 1"
+             -image "placeReflection.png"
+             brPlaceReflectionMenuOptionItem;
+
+    $ann = "Drag a region to zoom and pan into the current view";
+    $cmd = "python(\"from quickZoom import quickZoomTool; quickZoomTool.create()\")";
+
+    menuItem -label "Quick Zoom Tool"
+             -annotation $ann
+             -command $cmd
+             -image "quickZoom.png"
+             brQuickZoomMenuItem;
+}
+
 global proc brPlaceReflectionAddMenuItem()
 {
     global string $gMainModifyMenu;
@@ -45,33 +72,19 @@ global proc brPlaceReflectionAddMenuItem()
     string $menu = $gMainModifyMenu;
 
     if (!`menu -query -numberOfItems $menu` || `menu -query -label $menu` != "Modify")
-        error "Error creating place reflection menu item.";
+    {
+        warning "Unable to create place reflection menu item in modify menu. Adding a new menu after the last menu.";
+        menu -label "Place Reflection" -p MayaWindow;
+    }
     else
     {
         setParent -m $menu;
+        string $div = "";
         if ($version >= 2015)
-        {
-            menuItem -divider 1
-                     -dividerLabel "Place Reflection"
-                     brPlaceReflectionMenuDivider;
-        }
-        else
-            menuItem -divider 1 brPlaceReflectionMenuDivider;
-
-        string $ann = "Place an object by dragging over it's reflection point on a mesh surface";
-        string $cmd = "python(\"from placeReflection import placeReflectionTool; placeReflectionTool.create()\")";
-
-        menuItem -label "Place Reflection"
-                 -annotation $ann
-                 -command $cmd
-                 -image "placeReflection.png"
-                 brPlaceReflectionMenuItem;
-        menuItem -optionBox 1
-                 -annotation $ann
-                 -command "brPerformPlaceReflection 1"
-                 -image "placeReflection.png"
-                 brPlaceReflectionMenuOptionItem;
+            $div = "-dividerLabel \"Place Reflection\" ";
+        eval("menuItem -divider 1 " + $div + "brPlaceReflectionMenuDivider");
     }
+    addMenuItem;
 }
 
 // ---------------------------------------------------------------------

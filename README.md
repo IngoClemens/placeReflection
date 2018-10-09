@@ -18,6 +18,8 @@ The default dragger context mode. LMB click and drag to place the selected objec
 
 Press and hold Ctrl or Shift while dragging. This moves the object towards/away from the reflection point. Ctrl gives a finer control whereas Shift performs the moving in a faster fashion.
 
+This module also contains the Quick Zoom Tool. Please see the end of this file for a description.
+
 ## Installation
 
 For ease of use the script and related files are combined as a module. This allows for an easy installation and keeps all necessary files in one location.
@@ -40,14 +42,14 @@ Restart Maya. The modify menu in the main menu bar should now contain the menu i
 
 ## Usage:
 
-When properly installed the Maya Modify menu has a new menu item named Place Reflection. It also allows to open a standard option box to set the preferences for the tool.
+When properly installed the Maya Modify menu has a new menu item named Place Reflection Tool. It also allows to open a standard option box to set the preferences for the tool.
 
 # Standalone
 
 When using the script without the supplementary scripts the tool can be activated using the following commands with the current selection:
 
 ```
-#import the module and create the context
+# import the module and create the context
 from placeReflection import placeReflectionTool
 placeReflectionTool.create()
 ```
@@ -106,6 +108,13 @@ placeReflectionTool.speed(0) # slow
 
 ## Changelog:
 
+**1.2.2 (2018-10-07)**
+
+    - In case the menu item cannot be added to the modify menu a new menu gets created after the last.
+    - Fixed an incompatibility when calling the tool from another module.
+    - Adjustments to the option box.
+    - Added the quick zoom tool.
+
 **1.2.1 (2018-10-05)**
 
     - Reversed the speed modifiers shift and ctrl to be more inline with the default Maya navigation (channel box).
@@ -129,3 +138,27 @@ placeReflectionTool.speed(0) # slow
 **1.0.0 (2018-10-02)**
 
     - Initial version.
+
+
+# Quick Zoom
+Maya tool: This tool creates a standard dragger context which allows to define a region for quickly setting the 2D pan/zoom of the current camera.
+
+## Usage:
+
+When properly installed the Maya Modify menu has a new menu item named Quick Zoom Tool.
+
+With the tool active drag a region over the area where the camera should 2D pan/zoom into. Use ctrl+LMB to toggle switch between the standard view and the pan/zoom view. With pan/zoom active shift+LMB drag with the mouse to pan the view.
+
+**Limitations:**
+
+The tool currently does not draw a rectangular marquee which the user might expect. This is due to the current limitations of the maya python API. This might get addressed in future versions.
+
+# Standalone
+
+When using the script without the supplementary scripts the tool can be activated using the following commands:
+
+```
+# import the module and create the context
+from quickZoom import quickZoomTool
+quickZoomTool.create()
+```

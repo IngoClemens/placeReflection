@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 2, 1], "date": "2018-10-05"}
+VERSION = {"version": [1, 2, 2], "date": "2018-10-07"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -74,6 +74,14 @@ VERSION = {"version": [1, 2, 1], "date": "2018-10-05"}
 # ----------------------------------------------------------------------
 # Changelog:
 #
+#   1.2.2 - 2018-10-07
+#         - In case the menu item cannot be added to the modify menu a
+#           new menu gets created after the last.
+#         - Fixed an incompatibility when calling the tool from another
+#           module.
+#         - Adjustments to the option box.
+#         - Added the quick zoom tool.
+#
 #   1.2.1 - 2018-10-05
 #         - Reversed the speed modifiers shift and ctrl to be more
 #           inline with the default Maya navigation (channel box).
@@ -83,8 +91,8 @@ VERSION = {"version": [1, 2, 1], "date": "2018-10-05"}
 #   1.2.0 - 2018-10-04
 #         - Added the option to define the axis which should aim towards
 #           the point of reflection.
-#         - Added the options to either affect just the translation or the
-#           rotation of the placing object.
+#         - Added the options to either affect just the translation or
+#           the rotation of the placing object.
 #         - Added a standard Maya option dialog for setting tool
 #           preferences.
 #         - Added a menu item in the default Maya modify menu.
@@ -92,16 +100,17 @@ VERSION = {"version": [1, 2, 1], "date": "2018-10-05"}
 #   1.1.0 - 2018-10-03
 #         - Added a second speed mode which is accesible by pressing the
 #           control key (shift: slow, ctrl: fast)
-#         - Changed the optionVar names to reflect the new speed settings.
+#         - Changed the optionVar names to reflect the new speed
+#           settings.
 #         - The executing _place() method now directly receives the
-#           modifier key instead of just a boolean to turn move mode on or
-#           off.
+#           modifier key instead of just a boolean to turn move mode on
+#           or off.
 #         - Fixed a stutter during the placing when the placing object
 #           moved under the cursor and gets picked as the object to drag
 #           on.
 #
 #   1.0.0 - 2018-10-02
-#         Initial version.
+#         - Initial version.
 #
 # ----------------------------------------------------------------------
 
@@ -169,7 +178,7 @@ class PlaceReflection():
 
 
     # ------------------------------------------------------------------
-    # create and delete for the context
+    # context creating and deleting
     # ------------------------------------------------------------------
 
     def create(self):
@@ -179,10 +188,10 @@ class PlaceReflection():
                       "Hold ctrl (slow) or shift (fast) to move.")
         if not cmds.draggerContext(CONTEXT_NAME, exists=True):
             cmds.draggerContext(CONTEXT_NAME,
-                                pressCommand="placeReflectionTool._press()",
-                                dragCommand="placeReflectionTool._drag()",
-                                releaseCommand="placeReflectionTool._release()",
-                                finalize="placeReflectionTool._finalize()",
+                                pressCommand=self._press,
+                                dragCommand=self._drag,
+                                releaseCommand=self._release,
+                                finalize=self._finalize,
                                 space="screen",
                                 stepsCount=1,
                                 undoMode="step",
@@ -417,7 +426,7 @@ class PlaceReflection():
         if self._dag is None:
             return
 
-        # get the drag point from the context and perform the placing
+        # get the drag points from the context and perform the placing
         anchorPoint = cmds.draggerContext(CONTEXT_NAME, query=True, anchorPoint=True)
         dragPoint = cmds.draggerContext(CONTEXT_NAME, query=True, dragPoint=True)
         modifier = cmds.draggerContext(CONTEXT_NAME, query=True, modifier=True)

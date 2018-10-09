@@ -7,7 +7,7 @@
 // Copyright (c) 2018 Ingo Clemens, brave rabbit
 // www.braverabbit.com
 //
-// Version: 1.2.1 (2018-10-05)
+// Version: 1.2.2 (2018-10-07)
 //
 // ---------------------------------------------------------------------
 
@@ -77,16 +77,16 @@ global proc brPlaceReflectionCallback (string $parent, int $doIt)
 
 global proc brPlaceReflectionOptions()
 {
-    // global template variable for form spacing
+    // global template variables for spacing
+    global int $gOptionBoxTemplateDescriptionMarginWidth;
     global int $gOptionBoxTemplateFrameSpacing;
 
-    string $desc = "Usage:\n";
-    $desc += "Select any transform node to place and activate the tool.\n";
+    string $desc = "Select any transform node to place and activate the tool.\n";
     $desc += ("LMB drag over any mesh surface to place the selection at a reflected\n"+
               "position across the surface.\n");
     $desc += ("Press and hold the shift or ctrl key while dragging to move the object\n"+
               "towards or away from the surface.\n");
-    $desc += "Click and dragging while holding shift or ctrl directly moves the object.\n";
+    $desc += "Click and dragging while holding shift or ctrl directly moves the object.";
 
     string $commandName = "brPlaceReflection";
     string $callback = $commandName + "Callback";
@@ -110,14 +110,20 @@ global proc brPlaceReflectionOptions()
     // form layout
     string $parent = `formLayout placeReflectionOptions`;
 
+        // description frame
+        string $descriptionFrame = `frameLayout -label "Description"
+                                                -marginWidth $gOptionBoxTemplateDescriptionMarginWidth`;
+
+            columnLayout;
+
+                text -label $desc;
+
+        setParent $parent;
+
         // settings frame
         string $settingsFrame = `frameLayout -label "Settings"`;
 
             columnLayout;
-
-                text -label $desc -align "left";
-
-                separator -style "in";
 
                 radioButtonGrp
                     -numberOfRadioButtons 3
@@ -132,7 +138,7 @@ global proc brPlaceReflectionOptions()
                     -value1 `optionVar -query brPlaceReflectionInvertAxis`
                     placeReflectionDirection;
 
-                separator -style "in";
+                separator -style "none";
 
                 checkBoxGrp
                     -label1 "Translation"
@@ -144,7 +150,7 @@ global proc brPlaceReflectionOptions()
                     -value1 `optionVar -query brPlaceReflectionAffectRotation`
                     placeReflectionAffectRotation;
 
-                separator -style "in";
+                separator -style "none";
 
                 floatSliderGrp
                     -field true
@@ -174,10 +180,17 @@ global proc brPlaceReflectionOptions()
 
     // attach description/settings frames to form layout
     formLayout -edit
-               -attachForm $settingsFrame "top" $gOptionBoxTemplateFrameSpacing
+
+               -attachForm $descriptionFrame "top" $gOptionBoxTemplateFrameSpacing
+               -attachForm $descriptionFrame "left" $gOptionBoxTemplateFrameSpacing
+               -attachForm $descriptionFrame "right" $gOptionBoxTemplateFrameSpacing
+               -attachNone $descriptionFrame "bottom"
+
+               -attachControl $settingsFrame "top" $gOptionBoxTemplateFrameSpacing $descriptionFrame
                -attachForm $settingsFrame "left" $gOptionBoxTemplateFrameSpacing
                -attachForm $settingsFrame "right" $gOptionBoxTemplateFrameSpacing
                -attachNone $settingsFrame "bottom"
+
     $parent;
 
     waitCursor -state 0;
