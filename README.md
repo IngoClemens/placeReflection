@@ -1,6 +1,8 @@
 # Place Reflection
 Maya tool: Perform a reflection-based placement of lights (or any other object) on a mesh.
 
+Demo on Vimeo: [Place Reflection & Quick Zoom](https://vimeo.com/294221980)
+
 **placeReflection and quickZoom are under the terms of the MIT License**
 
 ### Description:
