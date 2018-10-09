@@ -1,11 +1,11 @@
 # Place Reflection
 Maya tool: Perform a reflection-based placement of lights (or any other object) on a mesh.
 
-**Place Reflection is under the terms of the MIT License**
+**placeReflection and quickZoom are under the terms of the MIT License**
 
 ### Description:
 
-This tool creates a standard dragger context which places the selected object at a reflected position based on the view vector and the surface normal of a mesh at the cursor position. Though any object can be placed this way it's main usage is to easily place a light so that the main light reflection occurs at the point of the cursor.
+This tool creates a standard dragger context which places the selected object at a reflected position based on the view vector and the surface normal of a mesh at the cursor position. Though any object can be placed this way it's main usage is to easily place a light so that the light reflection occurs at the point of the cursor.
 
 The tool has two modes:
 
@@ -24,6 +24,10 @@ This module also contains the Quick Zoom Tool. Please see the end of this file f
 
 For ease of use the script and related files are combined as a module. This allows for an easy installation and keeps all necessary files in one location.
 
+**_Important:_**
+
+**_If after the installation the menu items don't show up it's possible that the downloaded files from github have faulty user permissions. In this case try to create the modules folder manually and check the permissions or download the file from [braverabbit](http://www.braverabbit.com/placereflection/)_**
+
 Copy the module folder from the repository to your Maya preferences. The tool is version independent which means it can be installed in the preferences root folder.
 
 The Maya preferences root directory is located at:
@@ -38,7 +42,7 @@ Inside the modules folder, rename the module template file, which matches your o
 
 Edit the file in a text editor and replace USERNAME in the path with your user name. Save the file.
 
-Restart Maya. The modify menu in the main menu bar should now contain the menu item Place Reflection at the bottom.
+Restart Maya. The modify menu in the main menu bar should now contain the menu items Place Reflection Tool and Quick Zoom Tool at the bottom.
 
 ## Usage:
 
@@ -103,10 +107,14 @@ placeReflectionTool.speed(0) # slow
 ```
 
 
-### Latest version: 1.2.1 (2018-10-05)
+### Latest version: 1.2.3 (2018-10-09)
 
 
 ## Changelog:
+
+**1.2.3 (2018-10-09)**
+
+    - Added an in-view message when the tool is active.
 
 **1.2.2 (2018-10-07)**
 

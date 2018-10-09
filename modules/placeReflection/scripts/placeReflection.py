@@ -137,6 +137,10 @@ SPEED_FAST = "brPlaceReflectionSpeedFast"
 SPEED_SLOW_VALUE = 0.001
 SPEED_FAST_VALUE = 0.01
 
+VIEW_MESSAGE = ("<hl>Drag</hl> to place.  |  "
+                "<hl>Shift drag</hl> to move slow.  |  "
+                "<hl>Ctrl drag</hl> to move fast.")
+
 
 class PlaceReflection():
 
@@ -191,6 +195,7 @@ class PlaceReflection():
                                 pressCommand=self._press,
                                 dragCommand=self._drag,
                                 releaseCommand=self._release,
+                                initialize=self._initialize,
                                 finalize=self._finalize,
                                 space="screen",
                                 stepsCount=1,
@@ -211,6 +216,21 @@ class PlaceReflection():
         tool = mel.eval("global string $gSelect; setToolTo $gSelect;")
         cmds.deleteUI(CONTEXT_NAME)
         logger.info("Deleted {}".format(CONTEXT_NAME))
+
+
+    def _message(self, msg):
+        """Display the given message as a status in-view message.
+
+        :param msg: The message string to display.
+        :type msg: str
+        """
+        cmds.inViewMessage(statusMessage=msg, position="topCenter")
+
+
+    def _deleteMessage(self):
+        """Delete the in view message.
+        """
+        cmds.inViewMessage(clear="topCenter")
 
 
     def _version(self, long=True):
@@ -443,6 +463,12 @@ class PlaceReflection():
         self._meshDag = None
 
 
+    def _initialize(self):
+        """Method to be executed when the tool is entered.
+        """
+        self._message(VIEW_MESSAGE)
+
+
     def _finalize(self):
         """Method to be executed when the tool is exited.
 
@@ -450,6 +476,7 @@ class PlaceReflection():
         """
         self._moveDist = 0.0
         self._isSet = False
+        self._deleteMessage()
         logger.info("Reset {}".format(CONTEXT_NAME))
 
 

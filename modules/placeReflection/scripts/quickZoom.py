@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 0, 0], "date": "2018-10-08"}
+VERSION = {"version": [1, 0, 1], "date": "2018-10-09"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -41,6 +41,11 @@ VERSION = {"version": [1, 0, 0], "date": "2018-10-08"}
 # ----------------------------------------------------------------------
 # Changelog:
 #
+#   1.0.1 - 2018-10-09
+#         - Removed an error after the mouse has been released in an
+#           orthogonal view.
+#         - Edited the in-view message for the zoomed state.
+#
 #   1.0.0 - 2018-10-08
 #         - Initial version.
 #
@@ -56,7 +61,7 @@ logger = logging.getLogger(__name__)
 
 CONTEXT_NAME = "brQuickZoomContext"
 ZOOM_MESSAGE = "<hl>Drag</hl> a region to <hl>zoom/pan</hl> into."
-RESET_MESSAGE = "<hl>Ctrl</hl> click to <hl>reset</hl>.  |  <hl>Shift</hl> drag to <hl>pan</hl>."
+RESET_MESSAGE = "<hl>Ctrl click</hl> to <hl>reset</hl>.  |  <hl>Shift drag</hl> to <hl>pan</hl>."
 
 
 class QuickZoom():
@@ -80,6 +85,10 @@ class QuickZoom():
         self._startY = 0
         self._endX = 0
         self._endY = 0
+
+        # Switch to prevent the release event to run when the press
+        # command has been performed in an ortho view.
+        self._isOrtho = False
 
 
     # ------------------------------------------------------------------
@@ -158,6 +167,7 @@ class QuickZoom():
         """
         self._view = om2UI.M3dView().active3dView()
         self._mfn = om2.MFnCamera(self._view.getCamera())
+        self._isOrtho = self._mfn.isOrtho()
 
         # Exit, if it's not a perspective view.
         if self._mfn.isOrtho():
@@ -197,7 +207,7 @@ class QuickZoom():
         self._endY = int(dragPoint[1])
 
         # pan the view in case the shift modifier is pressed
-        if modifier == "shift" and self._mfn.panZoomEnabled:
+        if modifier == "shift" and self._mfn.panZoomEnabled and not self._isOrtho:
             self._pan()
 
 
@@ -207,7 +217,7 @@ class QuickZoom():
         Perform the zooming if no modifier is used.
         """
         modifier = cmds.draggerContext(CONTEXT_NAME, query=True, modifier=True)
-        if modifier == "none":
+        if modifier == "none" and not self._isOrtho:
             self._zoomView()
             self._message(RESET_MESSAGE)
 
@@ -397,7 +407,7 @@ quickZoomTool = QuickZoom()
 # MIT License
 #
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
-# placeReflection is under the terms of the MIT License
+# quickZoom is under the terms of the MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the

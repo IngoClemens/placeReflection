@@ -7,7 +7,7 @@
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
 # www.braverabbit.com
 #
-# Version: 1.2.2 (2018-10-07)
+# Version: 1.2.3 (2018-10-09)
 #
 # ----------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ utils.executeDeferred(addMenuItem)
 # MIT License
 #
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
-# placeReflection is under the terms of the MIT License
+# placeReflection and quickZoom are under the terms of the MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
