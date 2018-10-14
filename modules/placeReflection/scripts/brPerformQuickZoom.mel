@@ -1,0 +1,227 @@
+// ---------------------------------------------------------------------
+// brPerformQuickZoom.mel
+//
+// Creates an option box for setting the preferences for the quick zoom
+// tool.
+//
+// Copyright (c) 2018 Ingo Clemens, brave rabbit
+// www.braverabbit.com
+//
+// Version: 1.0.2 (2018-10-14)
+//
+// ---------------------------------------------------------------------
+
+proc setOptionVars( int $forceFactorySettings )
+{
+    string $cmd = "from quickZoom import quickZoomTool; ";
+    $cmd += "quickZoomTool._setOptionVars(" + $forceFactorySettings + ")";
+    python($cmd);
+}
+
+
+global proc brQuickZoomSetup( string $parent, int $forceFactorySettings )
+{
+    setOptionVars($forceFactorySettings);
+    setParent $parent;
+
+    radioButtonGrp -edit
+                   -select (`optionVar -query brQuickZoomMessageType` + 1)
+                   quickZoomMessageType;
+}
+
+
+global proc brQuickZoomCallback (string $parent, int $doIt)
+{
+    setParent $parent;
+
+    optionVar -intValue brQuickZoomMessageType
+              (`radioButtonGrp -query -select quickZoomMessageType` - 1);
+
+    if (`draggerContext -exists brQuickZoomContext`)
+    {
+        string $cmd = "from quickZoom import quickZoomTool; ";
+        $cmd += "quickZoomTool._getOptionVars()";
+        python($cmd);
+    }
+
+    if ($doIt)
+    {
+        brPerformQuickZoom 0;
+        string $cmd = "brPerformQuickZoom 0 ";
+        addToRecentCommandQueue $cmd "Quick Zoom";
+    }
+}
+
+
+global proc brQuickZoomOptions()
+{
+    // global template variables for spacing
+    global int $gOptionBoxTemplateDescriptionMarginWidth;
+    global int $gOptionBoxTemplateFrameSpacing;
+
+    string $desc = "In a perspective view drag a region to zoom and pan into.\n";
+    $desc += "Ctrl + LMB in a zoomed view toggles the zoom/pan mode.\n";
+    $desc += "Shift + LMB drag in a zoomed view pans the view.\n";
+
+    string $commandName = "brQuickZoom";
+    string $callback = $commandName + "Callback";
+    string $setup = $commandName + "Setup";
+
+    setOptionVars 0;
+
+    // get the option box
+    string $layout = getOptionBox();
+    setParent $layout;
+
+    // pass the command to the option box
+    setOptionBoxCommandName($commandName);
+
+    // activate the option box template
+    setUITemplate -pushTemplate OptionBoxTemplate;
+
+    // create the content
+    waitCursor -state 1;
+
+    // form layout
+    string $parent = `formLayout quickZoomOptions`;
+
+        // description frame
+        string $descriptionFrame = `frameLayout -label "Description"
+                                                -marginWidth $gOptionBoxTemplateDescriptionMarginWidth`;
+
+            columnLayout;
+
+                text -label $desc;
+
+        setParent $parent;
+
+        // settings frame
+        string $settingsFrame = `frameLayout -label "Settings"`;
+
+            columnLayout;
+
+                radioButtonGrp
+                    -numberOfRadioButtons 3
+                    -label "In-View Message"
+                    -labelArray3 "None" "Assistance" "Status"
+                    -select 3
+                    -vertical
+                    quickZoomMessageType;
+
+            setParent ..;
+
+        setParent $parent;
+
+    setParent ..;
+
+    // attach description/settings frames to form layout
+    formLayout -edit
+
+               -attachForm $descriptionFrame "top" $gOptionBoxTemplateFrameSpacing
+               -attachForm $descriptionFrame "left" $gOptionBoxTemplateFrameSpacing
+               -attachForm $descriptionFrame "right" $gOptionBoxTemplateFrameSpacing
+               -attachNone $descriptionFrame "bottom"
+
+               -attachControl $settingsFrame "top" $gOptionBoxTemplateFrameSpacing $descriptionFrame
+               -attachForm $settingsFrame "left" $gOptionBoxTemplateFrameSpacing
+               -attachForm $settingsFrame "right" $gOptionBoxTemplateFrameSpacing
+               -attachNone $settingsFrame "bottom"
+
+    $parent;
+
+    waitCursor -state 0;
+
+    // deactivate the template
+    setUITemplate -popTemplate;
+
+    // customize the buttons
+    string $applyBtn = getOptionBoxApplyBtn();
+    button -edit
+           -label "Apply"
+           -command ($callback + " " + $parent + " " + 1)
+           $applyBtn;
+
+    string $applyAndCloseBtn = getOptionBoxApplyAndCloseBtn();
+    button -edit
+           -label "Apply And Close"
+           $applyAndCloseBtn;
+
+    string $saveBtn = getOptionBoxSaveBtn();
+    button -edit
+           -command ($callback + " " + $parent + " " + 0 + " " + "; hideOptionBox")
+           $saveBtn;
+
+    string $resetBtn = getOptionBoxResetBtn();
+    button -edit
+           -command ($setup + " " + $parent + " " + 1)
+           $resetBtn;
+
+    // set the window title
+    setOptionBoxTitle("Quick Zoom Options");
+
+    // edit the help text
+    setOptionBoxHelpTag("QuickZoom");
+
+    // set the current values
+    eval ($setup + " " + $parent + " " + 0);
+
+    // show the option box
+    showOptionBox();
+}
+
+
+proc string assembleCmd()
+{
+    setOptionVars 0;
+    string $cmd = "from quickZoom import quickZoomTool; ";
+    $cmd += "quickZoomTool.create()";
+    return $cmd;
+}
+
+
+global proc string brPerformQuickZoom( int $option )
+{
+    string $cmd = "";
+    switch ($option)
+    {
+        case 0:
+            $cmd = `assembleCmd`;
+            python($cmd);
+            break;
+        case 1:
+            brQuickZoomOptions;
+            break;
+        case 2:
+            $cmd = `assembleCmd`;
+            break;
+    }
+    return $cmd;
+}
+
+// ---------------------------------------------------------------------
+// MIT License
+//
+// Copyright (c) 2018 Ingo Clemens, brave rabbit
+// quickZoom is under the terms of the MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Author: Ingo Clemens    www.braverabbit.com
+// ---------------------------------------------------------------------
