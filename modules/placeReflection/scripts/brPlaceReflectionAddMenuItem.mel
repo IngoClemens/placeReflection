@@ -7,7 +7,7 @@
 // Copyright (c) 2018 Ingo Clemens, brave rabbit
 // www.braverabbit.com
 //
-// Version: 1.2.3 (2018-10-09)
+// Version: 1.2.4 (2018-10-14)
 //
 // ---------------------------------------------------------------------
 
@@ -15,9 +15,11 @@ global proc brPlaceReflectionDeleteMenuItem()
 {
     deleteUI brPlaceReflectionMenuDivider;
     deleteUI brPlaceReflectionMenuItem;
-    deleteUI brPlaceReflectionMenuOptionItem;
+    deleteUI brPlaceReflectionOptionMenuItem;
     deleteUI brQuickZoomMenuItem;
+    deleteUI brQuickZoomOptionMenuItem;
 }
+
 
 proc int mayaVersion()
 {
@@ -26,6 +28,7 @@ proc int mayaVersion()
         $version = $version / 100;
     return $version;
 }
+
 
 global proc brPlaceReflectionAddMenuCommand()
 {
@@ -38,31 +41,36 @@ global proc brPlaceReflectionAddMenuCommand()
              $gMainModifyMenu;
 }
 
+
 proc addMenuItem()
 {
     string $ann = "Place an object by dragging over it's reflection point on a mesh surface";
-    string $cmd = "python(\"from placeReflection import placeReflectionTool; placeReflectionTool.create()\")";
 
     menuItem -label "Place Reflection Tool"
              -annotation $ann
-             -command $cmd
+             -command "brPerformPlaceReflection 0"
              -image "placeReflection.png"
              brPlaceReflectionMenuItem;
     menuItem -optionBox 1
              -annotation $ann
              -command "brPerformPlaceReflection 1"
              -image "placeReflection.png"
-             brPlaceReflectionMenuOptionItem;
+             brPlaceReflectionOptionMenuItem;
 
     $ann = "Drag a region to zoom and pan into the current view";
-    $cmd = "python(\"from quickZoom import quickZoomTool; quickZoomTool.create()\")";
 
     menuItem -label "Quick Zoom Tool"
              -annotation $ann
-             -command $cmd
+             -command "brPerformQuickZoom 0"
              -image "quickZoom.png"
              brQuickZoomMenuItem;
+    menuItem -optionBox 1
+             -annotation $ann
+             -command "brPerformQuickZoom 1"
+             -image "placeReflection.png"
+             brQuickZoomOptionMenuItem;
 }
+
 
 global proc brPlaceReflectionAddMenuItem()
 {

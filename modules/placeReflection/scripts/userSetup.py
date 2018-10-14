@@ -7,7 +7,7 @@
 # Copyright (c) 2018 Ingo Clemens, brave rabbit
 # www.braverabbit.com
 #
-# Version: 1.2.3 (2018-10-09)
+# Version: 1.2.4 (2018-10-14)
 #
 # ----------------------------------------------------------------------
 

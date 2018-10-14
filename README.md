@@ -109,10 +109,15 @@ placeReflectionTool.speed(0) # slow
 ```
 
 
-### Latest version: 1.2.3 (2018-10-09)
+### Latest version: 1.2.4 (2018-10-14)
 
 
 ## Changelog:
+
+**1.2.4 (2018-10-14)**
+
+    - Added a preference for the in-view message (place reflection and quick zoom).
+    - Quick zoom: Improved panning accuracy at different viewport sizes.
 
 **1.2.3 (2018-10-09)**
 

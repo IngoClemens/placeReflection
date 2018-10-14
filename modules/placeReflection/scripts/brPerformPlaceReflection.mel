@@ -7,7 +7,7 @@
 // Copyright (c) 2018 Ingo Clemens, brave rabbit
 // www.braverabbit.com
 //
-// Version: 1.2.3 (2018-10-09)
+// Version: 1.2.4 (2018-10-14)
 //
 // ---------------------------------------------------------------------
 
@@ -17,6 +17,7 @@ proc setOptionVars( int $forceFactorySettings )
     $cmd += "placeReflectionTool._setOptionVars(" + $forceFactorySettings + ")";
     python($cmd);
 }
+
 
 global proc brPlaceReflectionSetup( string $parent, int $forceFactorySettings )
 {
@@ -41,7 +42,11 @@ global proc brPlaceReflectionSetup( string $parent, int $forceFactorySettings )
     floatSliderGrp -edit
                    -value `optionVar -query brPlaceReflectionSpeedFast`
                    placeReflectionSpeedFast;
+    radioButtonGrp -edit
+                   -select (`optionVar -query brPlaceReflectionMessageType` + 1)
+                   placeReflectionMessageType;
 }
+
 
 global proc brPlaceReflectionCallback (string $parent, int $doIt)
 {
@@ -59,6 +64,8 @@ global proc brPlaceReflectionCallback (string $parent, int $doIt)
               `floatSliderGrp -query -value placeReflectionSpeedSlow`;
     optionVar -floatValue brPlaceReflectionSpeedFast
               `floatSliderGrp -query -value placeReflectionSpeedFast`;
+    optionVar -intValue brPlaceReflectionMessageType
+              (`radioButtonGrp -query -select placeReflectionMessageType` - 1);
 
     if (`draggerContext -exists brPlaceReflectionContext`)
     {
@@ -75,6 +82,7 @@ global proc brPlaceReflectionCallback (string $parent, int $doIt)
     }
 }
 
+
 global proc brPlaceReflectionOptions()
 {
     // global template variables for spacing
@@ -82,11 +90,12 @@ global proc brPlaceReflectionOptions()
     global int $gOptionBoxTemplateFrameSpacing;
 
     string $desc = "Select any transform node to place and activate the tool.\n";
-    $desc += ("LMB drag over any mesh surface to place the selection at a reflected\n"+
+    $desc += ("LMB + Drag over any mesh surface to place the selection at a reflected\n"+
               "position across the surface.\n");
     $desc += ("Press and hold the shift or ctrl key while dragging to move the object\n"+
               "towards or away from the surface.\n");
-    $desc += "Click and dragging while holding shift or ctrl directly moves the object.";
+    $desc += ("LMB click and dragging while holding shift or ctrl moves the object\n"+
+              "without placing.");
 
     string $commandName = "brPlaceReflection";
     string $callback = $commandName + "Callback";
@@ -172,6 +181,16 @@ global proc brPlaceReflectionOptions()
                     -label "Speed Max"
                     placeReflectionSpeedFast;
 
+                separator -style "none";
+
+                radioButtonGrp
+                    -numberOfRadioButtons 3
+                    -label "In-View Message"
+                    -labelArray3 "None" "Assistance" "Status"
+                    -select 3
+                    -vertical
+                    placeReflectionMessageType;
+
             setParent ..;
 
         setParent $parent;
@@ -233,6 +252,7 @@ global proc brPlaceReflectionOptions()
     showOptionBox();
 }
 
+
 proc string assembleCmd()
 {
     setOptionVars 0;
@@ -240,6 +260,7 @@ proc string assembleCmd()
     $cmd += "placeReflectionTool.create()";
     return $cmd;
 }
+
 
 global proc string brPerformPlaceReflection( int $option )
 {

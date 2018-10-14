@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 0, 1], "date": "2018-10-09"}
+VERSION = {"version": [1, 0, 2], "date": "2018-10-14"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -41,6 +41,10 @@ VERSION = {"version": [1, 0, 1], "date": "2018-10-09"}
 # ----------------------------------------------------------------------
 # Changelog:
 #
+#   1.0.2 - 2018-10-14
+#         - Added a preference for the in-view messages.
+#         - Improved panning accuracy at different viewport sizes.
+#
 #   1.0.1 - 2018-10-09
 #         - Removed an error after the mouse has been released in an
 #           orthogonal view.
@@ -60,6 +64,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 CONTEXT_NAME = "brQuickZoomContext"
+
+MESSAGE_TYPE = "brQuickZoomMessageType"
+
 ZOOM_MESSAGE = "<hl>Drag</hl> a region to <hl>zoom/pan</hl> into."
 RESET_MESSAGE = "<hl>Ctrl click</hl> to <hl>reset</hl>.  |  <hl>Shift drag</hl> to <hl>pan</hl>."
 
@@ -90,6 +97,11 @@ class QuickZoom():
         # command has been performed in an ortho view.
         self._isOrtho = False
 
+        # create the preference settings if they don't exist
+        self._setOptionVars()
+
+        self._viewType = 2
+
 
     # ------------------------------------------------------------------
     # context creating and deleting
@@ -115,6 +127,9 @@ class QuickZoom():
             logger.info("Created {}".format(CONTEXT_NAME))
         cmds.setToolTo(CONTEXT_NAME)
 
+        # get the preference settings
+        self._getOptionVars()
+
 
     def delete(self):
         """Delete the dragger context.
@@ -130,13 +145,22 @@ class QuickZoom():
         :param msg: The message string to display.
         :type msg: str
         """
-        cmds.inViewMessage(statusMessage=msg, position="topCenter")
+        if not self._viewType:
+            return
+        cmd = "inViewMessage"
+        if self._viewType == 1:
+            cmd += " -assistMessage \"{}\"".format(msg)
+        elif self._viewType == 2:
+            cmd += " -statusMessage \"{}\"".format(msg)
+        cmd += " -position \"topCenter\""
+        mel.eval(cmd)
 
 
     def _deleteMessage(self):
         """Delete the in view message.
         """
-        cmds.inViewMessage(clear="topCenter")
+        if self._viewType:
+            cmds.inViewMessage(clear="topCenter")
 
 
     def _version(self, long=True):
@@ -154,6 +178,26 @@ class QuickZoom():
             return version
         version = "{} {}".format(version, VERSION["date"])
         return version
+
+
+    # ------------------------------------------------------------------
+    # preferences
+    # ------------------------------------------------------------------
+
+    def _setOptionVars(self, reset=False):
+        """Set the preference values.
+
+        :param reset: True, to reset to the default values.
+        :type reset: bool
+        """
+        if reset or not cmds.optionVar(exists=MESSAGE_TYPE):
+            cmds.optionVar(floatValue=(MESSAGE_TYPE, 2))
+
+
+    def _getOptionVars(self):
+        """Get the preference values.
+        """
+        self._viewType = cmds.optionVar(query=MESSAGE_TYPE)
 
 
     # ------------------------------------------------------------------
@@ -391,8 +435,13 @@ class QuickZoom():
         cam = self._mfn.name()
         zoom = self._mfn.zoom
 
-        hPan = self._hPan+deltaX*0.00081*zoom
-        vPan = self._vPan+deltaY*0.00081*zoom
+        if self._isHorizontal():
+            factor = pow(self._width*0.8, -0.9825)
+        else:
+            factor = pow(self._height*0.8, -1.0415)
+
+        hPan = self._hPan+deltaX*factor*zoom
+        vPan = self._vPan+deltaY*factor*zoom
 
         cmds.setAttr("{}.horizontalPan".format(cam), hPan)
         cmds.setAttr("{}.verticalPan".format(cam), vPan)

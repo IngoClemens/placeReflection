@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 2, 2], "date": "2018-10-07"}
+VERSION = {"version": [1, 2, 4], "date": "2018-10-14"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -74,6 +74,12 @@ VERSION = {"version": [1, 2, 2], "date": "2018-10-07"}
 # ----------------------------------------------------------------------
 # Changelog:
 #
+#   1.2.4 - 2018-10-14
+#         - Added a preference for the in-view message.
+#
+#   1.2.3 - 2018-10-09
+#         - Added an in-view message when the tool is active.
+#
 #   1.2.2 - 2018-10-07
 #         - In case the menu item cannot be added to the modify menu a
 #           new menu gets created after the last.
@@ -130,6 +136,7 @@ CONTEXT_NAME = "brPlaceReflectionContext"
 AFFECT_TRANSLATION = "brPlaceReflectionAffectTranslation"
 AFFECT_ROTATION = "brPlaceReflectionAffectRotation"
 INVERT_AXIS = "brPlaceReflectionInvertAxis"
+MESSAGE_TYPE = "brPlaceReflectionMessageType"
 ORIENT_AXIS = "brPlaceReflectionAxis"
 SPEED_SLOW = "brPlaceReflectionSpeedSlow"
 SPEED_FAST = "brPlaceReflectionSpeedFast"
@@ -179,6 +186,7 @@ class PlaceReflection():
         self._rotate = True
         self._speedSlow = 0.001
         self._speedFast = 0.01
+        self._viewType = 2
 
 
     # ------------------------------------------------------------------
@@ -224,13 +232,22 @@ class PlaceReflection():
         :param msg: The message string to display.
         :type msg: str
         """
-        cmds.inViewMessage(statusMessage=msg, position="topCenter")
+        if not self._viewType:
+            return
+        cmd = "inViewMessage"
+        if self._viewType == 1:
+            cmd += " -assistMessage \"{}\"".format(msg)
+        elif self._viewType == 2:
+            cmd += " -statusMessage \"{}\"".format(msg)
+        cmd += " -position \"topCenter\""
+        mel.eval(cmd)
 
 
     def _deleteMessage(self):
         """Delete the in view message.
         """
-        cmds.inViewMessage(clear="topCenter")
+        if self._viewType:
+            cmds.inViewMessage(clear="topCenter")
 
 
     def _version(self, long=True):
@@ -396,6 +413,9 @@ class PlaceReflection():
         if reset or not cmds.optionVar(exists=INVERT_AXIS):
             cmds.optionVar(intValue=(INVERT_AXIS, 1))
 
+        if reset or not cmds.optionVar(exists=MESSAGE_TYPE):
+            cmds.optionVar(floatValue=(MESSAGE_TYPE, 2))
+
         if reset or not cmds.optionVar(exists=ORIENT_AXIS):
             cmds.optionVar(intValue=(ORIENT_AXIS, 2))
 
@@ -411,10 +431,11 @@ class PlaceReflection():
         """
         self._axis = cmds.optionVar(query=ORIENT_AXIS)
         self._invert = cmds.optionVar(query=INVERT_AXIS)
-        self._translate = cmds.optionVar(query=AFFECT_TRANSLATION)
         self._rotate = cmds.optionVar(query=AFFECT_ROTATION)
         self._speedSlow = cmds.optionVar(query=SPEED_SLOW)
         self._speedFast = cmds.optionVar(query=SPEED_FAST)
+        self._translate = cmds.optionVar(query=AFFECT_TRANSLATION)
+        self._viewType = cmds.optionVar(query=MESSAGE_TYPE)
 
 
     # ------------------------------------------------------------------
