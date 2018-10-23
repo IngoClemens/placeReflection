@@ -4,11 +4,6 @@
 // Creates a menu item for the place reflection tool in the default Maya
 // modify menu.
 //
-// Copyright (c) 2018 Ingo Clemens, brave rabbit
-// www.braverabbit.com
-//
-// Version: 1.2.4 (2018-10-14)
-//
 // ---------------------------------------------------------------------
 
 global proc brPlaceReflectionDeleteMenuItem()
@@ -49,12 +44,12 @@ proc addMenuItem()
     menuItem -label "Place Reflection Tool"
              -annotation $ann
              -command "brPerformPlaceReflection 0"
-             -image "placeReflection.png"
+             -image "placeReflection.svg"
              brPlaceReflectionMenuItem;
     menuItem -optionBox 1
              -annotation $ann
              -command "brPerformPlaceReflection 1"
-             -image "placeReflection.png"
+             -image "placeReflection.svg"
              brPlaceReflectionOptionMenuItem;
 
     $ann = "Drag a region to zoom and pan into the current view";
@@ -62,12 +57,12 @@ proc addMenuItem()
     menuItem -label "Quick Zoom Tool"
              -annotation $ann
              -command "brPerformQuickZoom 0"
-             -image "quickZoom.png"
+             -image "quickZoom.svg"
              brQuickZoomMenuItem;
     menuItem -optionBox 1
              -annotation $ann
              -command "brPerformQuickZoom 1"
-             -image "placeReflection.png"
+             -image "placeReflection.svg"
              brQuickZoomOptionMenuItem;
 }
 

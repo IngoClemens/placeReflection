@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 2, 4], "date": "2018-10-14"}
+VERSION = {"version": [1, 2, 5], "date": "2018-10-23"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -73,6 +73,9 @@ VERSION = {"version": [1, 2, 4], "date": "2018-10-14"}
 #
 # ----------------------------------------------------------------------
 # Changelog:
+#
+#   1.2.5 - 2018-10-23
+#         - Updated the icon to SVG.
 #
 #   1.2.4 - 2018-10-14
 #         - Added a preference for the in-view message.
@@ -210,7 +213,7 @@ class PlaceReflection():
                                 undoMode="step",
                                 cursor="crossHair",
                                 helpString=helpString,
-                                image1="placeReflection.png")
+                                image1="placeReflection.svg")
             logger.info("Created {}".format(CONTEXT_NAME))
         cmds.setToolTo(CONTEXT_NAME)
 

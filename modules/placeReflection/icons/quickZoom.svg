@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="quickZoom" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#BFBFBF;}
+	.st1{fill:#3F3F3F;}
+	.st2{fill:#BFBFBF;stroke:#3F3F3F;stroke-width:16;stroke-miterlimit:10;}
+</style>
+<g id="marquee">
+	<rect x="201" y="33" class="st0" width="64" height="40"/>
+	<path class="st1" d="M257,41v24h-48V41H257 M273,25h-16h-48h-16v16v24v16h16h48h16V65V41V25L273,25z"/>
+	<rect x="121" y="33" class="st0" width="64" height="40"/>
+	<path class="st1" d="M177,41v24h-48V41H177 M193,25h-16h-48h-16v16v24v16h16h48h16V65V41V25L193,25z"/>
+	<rect x="201" y="313" class="st0" width="64" height="40"/>
+	<path class="st1" d="M257,321v24h-48v-24H257 M273,305h-16h-48h-16v16v24v16h16h48h16v-16v-24V305L273,305z"/>
+	<rect x="121" y="313" class="st0" width="64" height="40"/>
+	<path class="st1" d="M177,321v24h-48v-24H177 M193,305h-16h-48h-16v16v24v16h16h48h16v-16v-24V305L193,305z"/>
+	<polygon class="st0" points="281,353 281,313 313,313 313,281 353,281 353,353 	"/>
+	<path class="st1" d="M345,289v56h-56v-24h32v-32H345 M361,273h-16h-24h-16v16v16h-16h-16v16v24v16h16h56h16v-16v-56V273L361,273z"
+		/>
+	<rect x="313" y="201" class="st0" width="40" height="64"/>
+	<path class="st1" d="M345,209v48h-24v-48H345 M361,193h-16h-24h-16v16v48v16h16h24h16v-16v-48V193L361,193z"/>
+	<rect x="313" y="121" class="st0" width="40" height="64"/>
+	<path class="st1" d="M345,129v48h-24v-48H345 M361,113h-16h-24h-16v16v48v16h16h24h16v-16v-48V113L361,113z"/>
+	<polygon class="st0" points="313,105 313,73 281,73 281,33 353,33 353,105 	"/>
+	<path class="st1" d="M345,41v56h-24V65h-32V41H345 M361,25h-16h-56h-16v16v24v16h16h16v16v16h16h24h16V97V41V25L361,25z"/>
+	<polygon class="st0" points="33,353 33,281 73,281 73,313 105,313 105,353 	"/>
+	<path class="st1" d="M65,289v32h32v24H41v-56H65 M81,273H65H41H25v16v56v16h16h56h16v-16v-24v-16H97H81v-16V273L81,273z"/>
+	<rect x="33" y="201" class="st0" width="40" height="64"/>
+	<path class="st1" d="M65,209v48H41v-48H65 M81,193H65H41H25v16v48v16h16h24h16v-16v-48V193L81,193z"/>
+	<rect x="33" y="121" class="st0" width="40" height="64"/>
+	<path class="st1" d="M65,129v48H41v-48H65 M81,113H65H41H25v16v48v16h16h24h16v-16v-48V113L81,113z"/>
+	<rect x="33" y="121" class="st0" width="40" height="64"/>
+	<path class="st1" d="M65,129v48H41v-48H65 M81,113H65H41H25v16v48v16h16h24h16v-16v-48V113L81,113z"/>
+	<polygon class="st0" points="33,105 33,33 105,33 105,73 73,73 73,105 	"/>
+	<path class="st1" d="M97,41v24H65v32H41V41H97 M113,25H97H41H25v16v56v16h16h24h16V97V81h16h16V65V41V25L113,25z"/>
+</g>
+<path id="arrow" class="st2" d="M480.43,438.67l-82.37-81.94l36.58-36.75l-154.22-38.8L320,435.16l36.58-36.76l82.37,81.94
+	L480.43,438.67z"/>
+<g id="zoom">
+	<polygon class="st0" points="128.95,272.89 128.95,236.72 194,154.43 130.8,154.43 130.8,112.94 255.89,112.94 255.89,147.84 
+		189.86,231.5 256.08,231.5 256.08,272.89 	"/>
+	<path class="st1" d="M247.89,120.94v24.12l-74.53,94.43h74.72v25.39H136.95V239.5l73.57-93.07H138.8v-25.49L247.89,120.94
+		 M263.89,104.94h-16H138.8h-16v16v25.49v16h16h38.67l-53.08,67.14l-3.45,4.36v5.56v25.39v16h16h111.13h16v-16V239.5v-16h-16h-41.71
+		l54.08-68.52l3.44-4.36v-5.55v-24.12v-16.01H263.89z"/>
+</g>
+</svg>

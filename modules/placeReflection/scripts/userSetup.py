@@ -4,11 +4,6 @@
 # Automatically add the menu item for the place reflection tool upon
 # Maya startup.
 #
-# Copyright (c) 2018 Ingo Clemens, brave rabbit
-# www.braverabbit.com
-#
-# Version: 1.2.4 (2018-10-14)
-#
 # ----------------------------------------------------------------------
 
 from maya import cmds, mel, utils

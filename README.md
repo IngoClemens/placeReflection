@@ -109,10 +109,14 @@ placeReflectionTool.speed(0) # slow
 ```
 
 
-### Latest version: 1.2.4 (2018-10-14)
+### Latest version: 1.2.5 (2018-10-23)
 
 
 ## Changelog:
+
+**1.2.5 (2018-10-23)**
+
+    - Updated the icon to SVG.
 
 **1.2.4 (2018-10-14)**
 

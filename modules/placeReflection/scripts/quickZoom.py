@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 0, 2], "date": "2018-10-14"}
+VERSION = {"version": [1, 0, 3], "date": "2018-10-23"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -40,6 +40,9 @@ VERSION = {"version": [1, 0, 2], "date": "2018-10-14"}
 #
 # ----------------------------------------------------------------------
 # Changelog:
+#
+#   1.0.3 - 2018-10-23
+#         - Updated the icon to SVG.
 #
 #   1.0.2 - 2018-10-14
 #         - Added a preference for the in-view messages.
@@ -123,7 +126,7 @@ class QuickZoom():
                                 undoMode="step",
                                 cursor="default",
                                 helpString=helpString,
-                                image1="quickZoom.png")
+                                image1="quickZoom.svg")
             logger.info("Created {}".format(CONTEXT_NAME))
         cmds.setToolTo(CONTEXT_NAME)
 
