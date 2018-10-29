@@ -32,7 +32,6 @@ global proc brPlaceReflectionAddMenuCommand()
     if (`menu -ex $gMainModifyMenu`)
         menu -edit
              -postMenuCommand "brPlaceReflectionAddMenuItem"
-             -postMenuCommandOnce 1
              $gMainModifyMenu;
 }
 
@@ -74,20 +73,22 @@ global proc brPlaceReflectionAddMenuItem()
     int $version = `mayaVersion`;
     string $menu = $gMainModifyMenu;
 
-    if (!`menu -query -numberOfItems $menu` || `menu -query -label $menu` != "Modify")
-    {
-        warning "Unable to create place reflection menu item in modify menu. Adding a new menu after the last menu.";
-        menu -label "Place Reflection" -p MayaWindow;
-    }
-    else
-    {
-        setParent -m $menu;
-        string $div = "";
-        if ($version >= 2015)
-            $div = "-dividerLabel \"Place Reflection\" ";
-        eval("menuItem -divider 1 " + $div + "brPlaceReflectionMenuDivider");
-    }
+    if (!`menu -query -numberOfItems $menu`)
+        ModObjectsMenu $gMainModifyMenu;
+
+    setParent -m $menu;
+    string $div = "";
+    if ($version >= 2015)
+        $div = "-dividerLabel \"Place Reflection\" ";
+    eval("menuItem -divider 1 " + $div + "brPlaceReflectionMenuDivider");
+
     addMenuItem;
+
+    // Replace the command attached to the menu with the Maya default
+    // command to update the menu content.
+    menu -edit
+         -postMenuCommand ("ModObjectsMenu " + $gMainModifyMenu)
+         $gMainModifyMenu;
 }
 
 // ---------------------------------------------------------------------

@@ -109,10 +109,14 @@ placeReflectionTool.speed(0) # slow
 ```
 
 
-### Latest version: 1.2.5 (2018-10-23)
+### Latest version: 1.2.6 (2018-10-29)
 
 
 ## Changelog:
+
+**1.2.6 (2018-10-29)**
+
+    - Fixed that the menu items are not correctly added in Maya 2016.
 
 **1.2.5 (2018-10-23)**
 
