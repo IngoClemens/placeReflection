@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 2, 6], "date": "2018-10-29"}
+VERSION = {"version": [1, 2, 7], "date": "2018-12-14"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -73,6 +73,15 @@ VERSION = {"version": [1, 2, 6], "date": "2018-10-29"}
 #
 # ----------------------------------------------------------------------
 # Changelog:
+#
+#   1.2.7 - 2018-12-14
+#         - Fixed that the in-view message displayed the modifier-keys
+#           in the wrong order.
+#         - Fixed some code typos.
+#
+#   1.2.6 - 2018-10-29
+#         - Fixed that the menu items are not correctly added in Maya
+#           2016.
 #
 #   1.2.5 - 2018-10-23
 #         - Updated the icon to SVG.
@@ -148,8 +157,8 @@ SPEED_SLOW_VALUE = 0.001
 SPEED_FAST_VALUE = 0.01
 
 VIEW_MESSAGE = ("<hl>Drag</hl> to place.  |  "
-                "<hl>Shift drag</hl> to move slow.  |  "
-                "<hl>Ctrl drag</hl> to move fast.")
+                "<hl>Shift drag</hl> to move fast.  |  "
+                "<hl>Ctrl drag</hl> to move slow.")
 
 
 class PlaceReflection():

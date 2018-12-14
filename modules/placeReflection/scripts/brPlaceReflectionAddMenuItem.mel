@@ -74,9 +74,9 @@ global proc brPlaceReflectionAddMenuItem()
     string $menu = $gMainModifyMenu;
 
     if (!`menu -query -numberOfItems $menu`)
-        ModObjectsMenu $gMainModifyMenu;
+        ModObjectsMenu $menu;
 
-    setParent -m $menu;
+    setParent -menu $menu;
     string $div = "";
     if ($version >= 2015)
         $div = "-dividerLabel \"Place Reflection\" ";
@@ -87,8 +87,8 @@ global proc brPlaceReflectionAddMenuItem()
     // Replace the command attached to the menu with the Maya default
     // command to update the menu content.
     menu -edit
-         -postMenuCommand ("ModObjectsMenu " + $gMainModifyMenu)
-         $gMainModifyMenu;
+         -postMenuCommand ("ModObjectsMenu " + $menu)
+         $menu;
 }
 
 // ---------------------------------------------------------------------

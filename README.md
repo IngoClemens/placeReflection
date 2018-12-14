@@ -109,10 +109,15 @@ placeReflectionTool.speed(0) # slow
 ```
 
 
-### Latest version: 1.2.6 (2018-10-29)
+### Latest version: 1.2.7 (2018-12-14)
 
 
 ## Changelog:
+
+**1.2.7 (2018-12-14)**
+
+    - Fixed that the in-view message displayed the modifier-keys in the wrong order.
+    - Fixed some code typos.
 
 **1.2.6 (2018-10-29)**
 

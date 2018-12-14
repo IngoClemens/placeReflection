@@ -43,7 +43,7 @@ global proc brPlaceReflectionSetup( string $parent, int $forceFactorySettings )
 }
 
 
-global proc brPlaceReflectionCallback (string $parent, int $doIt)
+global proc brPlaceReflectionCallback( string $parent, int $doIt )
 {
     setParent $parent;
 
