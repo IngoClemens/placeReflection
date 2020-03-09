@@ -29,10 +29,12 @@ global proc brPlaceReflectionAddMenuCommand()
 {
     global string $gMainModifyMenu;
 
-    if (`menu -ex $gMainModifyMenu`)
-        menu -edit
-             -postMenuCommand "brPlaceReflectionAddMenuItem"
-             $gMainModifyMenu;
+    if (`menu -exists $gMainModifyMenu`)
+    {
+        string $cmd = `menu -query -postMenuCommand $gMainModifyMenu`;
+        $cmd += "; brPlaceReflectionAddMenuItem";
+        menu -edit -postMenuCommand $cmd $gMainModifyMenu;
+    }
 }
 
 
@@ -71,24 +73,17 @@ global proc brPlaceReflectionAddMenuItem()
     global string $gMainModifyMenu;
 
     int $version = `mayaVersion`;
-    string $menu = $gMainModifyMenu;
 
-    if (!`menu -query -numberOfItems $menu`)
-        ModObjectsMenu $menu;
+    if (!`menu -query -numberOfItems $gMainModifyMenu`)
+        ModObjectsMenu $gMainModifyMenu;
 
-    setParent -menu $menu;
+    setParent -menu $gMainModifyMenu;
     string $div = "";
     if ($version >= 2015)
         $div = "-dividerLabel \"Place Reflection\" ";
     eval("menuItem -divider 1 " + $div + "brPlaceReflectionMenuDivider");
 
     addMenuItem;
-
-    // Replace the command attached to the menu with the Maya default
-    // command to update the menu content.
-    menu -edit
-         -postMenuCommand ("ModObjectsMenu " + $menu)
-         $menu;
 }
 
 // ---------------------------------------------------------------------
