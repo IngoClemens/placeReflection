@@ -72,6 +72,9 @@ global proc brPlaceReflectionAddMenuItem()
 {
     global string $gMainModifyMenu;
 
+    if (`menuItem -query -exists brPlaceReflectionMenuDivider`)
+        return;
+
     int $version = `mayaVersion`;
 
     if (!`menu -query -numberOfItems $gMainModifyMenu`)
