@@ -113,7 +113,7 @@ class QuickZoom():
     def create(self):
         """Create the dragger context and set it to be the active tool.
         """
-        helpString = ("Drag a region to zoom/pan into the current view.")
+        helpString = "Drag a region to zoom/pan into the current view."
         if not cmds.draggerContext(CONTEXT_NAME, exists=True):
             cmds.draggerContext(CONTEXT_NAME,
                                 pressCommand=self._press,
@@ -137,7 +137,7 @@ class QuickZoom():
     def delete(self):
         """Delete the dragger context.
         """
-        tool = mel.eval("global string $gSelect; setToolTo $gSelect;")
+        mel.eval("global string $gSelect; setToolTo $gSelect;")
         cmds.deleteUI(CONTEXT_NAME)
         logger.info("Deleted {}".format(CONTEXT_NAME))
 
@@ -320,7 +320,7 @@ class QuickZoom():
 
         # The center of the defined region.
         # The region values are dependent on the view type and have to
-        # take the additonal space outside the aspect ratio into
+        # take the additional space outside the aspect ratio into
         # consideration.
         dragHalfX = (self._endX-self._startX)/2.0
         dragHalfY = (self._endY-self._startY)/2.0

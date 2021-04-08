@@ -52,7 +52,7 @@ VERSION = {"version": [1, 2, 7], "date": "2018-12-14"}
 #               2: z axis (default)
 #   invert: True, if the axis should point away from the reflection
 #           point. Default is True.
-#   rotate: True, if the rotation of the placing obeject should be
+#   rotate: True, if the rotation of the placing object should be
 #           affected. Default is True.
 #   speed: The speed when moving the object towards/away from the
 #          reflection point in move mode.
@@ -116,7 +116,7 @@ VERSION = {"version": [1, 2, 7], "date": "2018-12-14"}
 #         - Added a menu item in the default Maya modify menu.
 #
 #   1.1.0 - 2018-10-03
-#         - Added a second speed mode which is accesible by pressing the
+#         - Added a second speed mode which is accessible by pressing the
 #           control key (shift: slow, ctrl: fast)
 #         - Changed the optionVar names to reflect the new speed
 #           settings.
@@ -233,7 +233,7 @@ class PlaceReflection():
     def delete(self):
         """Delete the dragger context.
         """
-        tool = mel.eval("global string $gSelect; setToolTo $gSelect;")
+        mel.eval("global string $gSelect; setToolTo $gSelect;")
         cmds.deleteUI(CONTEXT_NAME)
         logger.info("Deleted {}".format(CONTEXT_NAME))
 
@@ -698,7 +698,7 @@ class PlaceReflection():
                  hitPoint: The intersection point.
                  hitRayParam: The ray length to the intersection.
                  hitFace: The face index of the intersection.
-                 hitTriangle: The relative index of the trangle.
+                 hitTriangle: The relative index of the triangle.
                  hitBary1: First barycentric coordinate.
                  hitBary2: Second barycentric coordinate.
         :rtype: tuple(om2.MFloatPoint, float, int, int, float, float)

@@ -25,7 +25,7 @@ global proc brQuickZoomSetup( string $parent, int $forceFactorySettings )
 }
 
 
-global proc brQuickZoomCallback (string $parent, int $doIt)
+global proc brQuickZoomCallback( string $parent, int $doIt )
 {
     setParent $parent;
 
