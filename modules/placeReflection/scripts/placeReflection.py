@@ -5,7 +5,7 @@
 # www.braverabbit.com
 # ----------------------------------------------------------------------
 
-VERSION = {"version": [1, 2, 7], "date": "2018-12-14"}
+VERSION = {"version": [1, 2, 8], "date": "2021-04-09"}
 
 # ----------------------------------------------------------------------
 # Description:
@@ -73,6 +73,9 @@ VERSION = {"version": [1, 2, 7], "date": "2018-12-14"}
 #
 # ----------------------------------------------------------------------
 # Changelog:
+#
+#   1.2.8 - 2021-04-09
+#         - Fixed errors when not dragging over mesh.
 #
 #   1.2.7 - 2018-12-14
 #         - Fixed that the in-view message displayed the modifier-keys
@@ -555,7 +558,7 @@ class PlaceReflection():
             # (hitPoint, hitRayParam, hitFace, hitTriangle, hitBary1,
             # hitBary2)
             intersection = self._closestIntersection(dagPath, worldPt, worldVector)
-            if not len(intersection[0]):
+            if intersection is None or not len(intersection[0]):
                 return
             # Store the hit point as the point of reflection.
             # This is of type MFloatPoint() (just a reminder because it
@@ -672,11 +675,15 @@ class PlaceReflection():
             if dagPath.fullPathName() == self._dag.fullPathName() and self._meshDag is not None:
                 return self._meshDag
 
-            dagPath.extendToShape()
-            name = dagPath.fullPathName()
-
-            if not dagPath.hasFn(om.MFn.kMesh):
-                return
+            # Make sure that the object under the cursor is a mesh. If
+            # not, return the last known mesh to prevent interruptions.
+            try:
+                dagPath.extendToShape()
+                name = dagPath.fullPathName()
+                if not dagPath.hasFn(om.MFn.kMesh):
+                    return self._meshDag
+            except:
+                return self._meshDag
 
             # converting to maya.api
             return self._asDagPath(name)

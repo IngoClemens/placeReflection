@@ -62,7 +62,12 @@ def getMayaVersions():
     """
     path = getPluginsPath(MODULE_NAME)
     path = os.path.join(path, getPlatform())
-    return sorted(os.listdir(path))
+    sortedItems = []
+    try:
+        sortedItems = sorted(os.listdir(path))
+    except:
+        pass
+    return sortedItems
 
 
 def getModuleNames():
@@ -99,6 +104,9 @@ def getPlugins():
     :rtype: list(str)
     """
     plugins = []
+    versions = getMayaVersions()
+    if not len(versions):
+        return []
     version = getMayaVersions()[-1]
     for searchModule in getModuleNames():
         if hasPlugins(searchModule):
@@ -1007,9 +1015,15 @@ def createModuleFile(modulePath, module, contentPath):
         recursiveIcons = False
 
     lines = ""
-    for version in getMayaVersions():
-        lines += "+ MAYAVERSION:{} {} any {}/{}\n".format(version, module, contentPath, module)
-        lines += buildContentSubpath(module, "plug-ins", version, getPlatform())
+    if hasPlugins(module):
+        for version in getMayaVersions():
+            lines += "+ MAYAVERSION:{} {} any {}/{}\n".format(version, module, contentPath, module)
+            lines += buildContentSubpath(module, "plug-ins", version, getPlatform())
+            lines += buildContentSubpath(module, "icons", recursive=recursiveIcons)
+            lines += buildContentSubpath(module, "scripts", recursive=True)
+            lines += "\n"
+    else:
+        lines += "+ {} any {}/{}\n".format(module, contentPath, module)
         lines += buildContentSubpath(module, "icons", recursive=recursiveIcons)
         lines += buildContentSubpath(module, "scripts", recursive=True)
         lines += "\n"
