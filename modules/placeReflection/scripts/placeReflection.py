@@ -75,7 +75,7 @@ VERSION = {"version": [1, 2, 8], "date": "2021-04-09"}
 # Changelog:
 #
 #   1.2.8 - 2021-04-09
-#         - Fixed errors when not dragging over mesh.
+#         - Fixed errors when not dragging over a mesh.
 #
 #   1.2.7 - 2018-12-14
 #         - Fixed that the in-view message displayed the modifier-keys
