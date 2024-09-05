@@ -4,7 +4,7 @@ Maya tools: Perform a reflection-based placement of lights (or any other object)
 Even though the tool is Open Source we appreciate if you would consider support for continued development via [Gumroad](https://braverabbit.gumroad.com/l/placeReflectionMaya)
 
 ## Video
-[Place Reflection & Quick Zoom on Vimeo](https://vimeo.com/294221980)
+[Place Reflection & Quick Zoom on YouTube](https://youtu.be/QjxTK5PkA9E)
 
 ## Installation
 Installation is easy with the included installer.
