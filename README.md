@@ -1,7 +1,7 @@
 # Place Reflection & Quick Zoom
 Maya tools: Perform a reflection-based placement of lights (or any other object) on a mesh or quickly quickly set the 2D pan/zoom of the current camera.
 
-Even though the tool is Open Source we appreciate if you would consider support for continued development via Gumroad: [https://braverabbit.gumroad.com/l/placeReflectionMaya]
+Even though the tool is Open Source we appreciate if you would consider support for continued development via [Gumroad](https://braverabbit.gumroad.com/l/placeReflectionMaya)
 
 ## Video
 [Place Reflection & Quick Zoom on Vimeo](https://vimeo.com/294221980)
